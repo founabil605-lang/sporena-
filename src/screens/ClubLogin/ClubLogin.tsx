@@ -6,25 +6,37 @@ import { Footer } from '../../components/Footer';
 
 export const ClubLogin = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Redirect if already logged in
+  // Commenting out to avoid redirect loops - let the auth state handle this
+  // if (user && user.role === 'club') {
+  //   navigate('/club/dashboard');
+  // }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = await signIn(email, password);
-    setLoading(false);
+    try {
+      const result = await signIn(email, password);
+      setLoading(false);
 
-    if (result.error) {
-      setError(result.error.message || 'Email ou mot de passe incorrect');
-    } else {
-      navigate('/club/dashboard');
+      if (result.error) {
+        setError(result.error.message || 'Email ou mot de passe incorrect');
+      } else {
+        // Navigate to dashboard on success
+        navigate('/club/dashboard');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError('Une erreur est survenue. Veuillez reessayer.');
     }
   };
 
@@ -43,7 +55,7 @@ export const ClubLogin = () => {
                 <span className="text-2xl font-black">S</span>
               </div>
               <h1 className="font-black text-2xl text-gray-900">Connexion Club</h1>
-              <p className="text-gray-500 text-sm mt-2">Accédez à votre espace de gestion</p>
+              <p className="text-gray-500 text-sm mt-2">Accedez a votre espace de gestion</p>
             </div>
 
             {error && (
@@ -96,7 +108,7 @@ export const ClubLogin = () => {
                   <span className="text-sm text-gray-600">Se souvenir de moi</span>
                 </label>
                 <Link to="/auth/forgot-password" className="text-sm text-[#00694c] font-medium hover:underline">
-                  Mot de passe oublié ?
+                  Mot de passe oublie ?
                 </Link>
               </div>
 
@@ -113,15 +125,8 @@ export const ClubLogin = () => {
               <p className="text-sm text-gray-500">
                 Pas encore inscrit ?{' '}
                 <Link to="/auth/club-register" className="text-[#00694c] font-semibold hover:underline">
-                  Créer un compte club
+                  Creer un compte club
                 </Link>
-              </p>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <p className="text-xs text-gray-400 text-center">
-                Identifiants de démonstration :<br />
-                <span className="font-mono font-semibold">demo@sporena.com</span> / <span className="font-mono font-semibold">demo123</span>
               </p>
             </div>
           </div>

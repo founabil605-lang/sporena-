@@ -21,11 +21,13 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
     );
   }
 
+  // Not logged in - redirect to auth
   if (!user) {
     const redirectTo = requiredRole === 'club' ? '/auth/club-login' : '/auth/fan-login';
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
+  // Check role requirement
   if (requiredRole && user.role !== requiredRole) {
     const redirectPath = user.role === 'club' ? '/club/dashboard' : '/';
     return <Navigate to={redirectPath} replace />;
