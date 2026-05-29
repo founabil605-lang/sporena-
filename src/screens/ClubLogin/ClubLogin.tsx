@@ -13,28 +13,27 @@ export const ClubLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in
-  // Commenting out to avoid redirect loops - let the auth state handle this
-  // if (user && user.role === 'club') {
-  //   navigate('/club/dashboard');
-  // }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      console.log('[ClubLogin] 1. Calling signIn...');
       const result = await signIn(email, password);
-      setLoading(false);
+      console.log('[ClubLogin] 2. signIn result:', result);
+      console.log('[ClubLogin] 3. user state at this point:', user);
 
       if (result.error) {
+        console.log('[ClubLogin] 4. Error returned:', result.error.message);
         setError(result.error.message || 'Email ou mot de passe incorrect');
+        setLoading(false);
       } else {
-        // Navigate to dashboard on success
+        console.log('[ClubLogin] 4. Success → navigating to /club/dashboard');
         navigate('/club/dashboard');
       }
     } catch (err) {
+      console.error('[ClubLogin] caught exception:', err);
       setLoading(false);
       setError('Une erreur est survenue. Veuillez reessayer.');
     }
