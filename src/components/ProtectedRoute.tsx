@@ -10,7 +10,10 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  console.log('[ProtectedRoute] loading:', loading, '| user:', user);
+
   if (loading) {
+    console.log('[ProtectedRoute] still loading → showing spinner');
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#faf9f5]">
         <div className="flex flex-col items-center gap-4">
@@ -21,17 +24,18 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
     );
   }
 
-  // Not logged in - redirect to auth
   if (!user) {
+    console.log('[ProtectedRoute] no user → redirecting to login');
     const redirectTo = requiredRole === 'club' ? '/auth/club-login' : '/auth/fan-login';
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // Check role requirement
   if (requiredRole && user.role !== requiredRole) {
+    console.log('[ProtectedRoute] wrong role:', user.role, '→ redirecting');
     const redirectPath = user.role === 'club' ? '/club/dashboard' : '/';
     return <Navigate to={redirectPath} replace />;
   }
 
+  console.log('[ProtectedRoute] access granted for role:', user.role);
   return <>{children}</>;
 };
