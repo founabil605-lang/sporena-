@@ -19,11 +19,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = useCallback(async (userId: string, sessionEmail?: string) => {
+    console.log('[Auth] fetchUserData called for userId:', userId);
     try {
       const [clubResult, memberResult] = await Promise.all([
         supabase.from('clubs').select('id, name').eq('user_id', userId).maybeSingle(),
         supabase.from('club_members').select('club_id, clubs(name)').eq('user_id', userId).maybeSingle(),
       ]);
+
+      console.log('[Auth] clubResult:', clubResult);
+      console.log('[Auth] memberResult:', memberResult);
 
       const clubData = clubResult.data;
       const memberData = memberResult.data as any;
@@ -36,10 +40,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         club_name: clubData?.name || memberData?.clubs?.name,
       };
 
+      console.log('[Auth] userData built:', userData);
       setUser(userData);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('[Auth] Error fetching user data:', error);
     } finally {
+      console.log('[Auth] fetchUserData done → setLoading(false)');
       setLoading(false);
     }
   }, []);
@@ -49,20 +55,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initAuth = async () => {
       try {
+        console.log('[Auth] initAuth: getting session...');
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
 
         setSession(session);
         if (session?.user) {
+          console.log('[Auth] initAuth: session found, fetching user data...');
           await fetchUserData(session.user.id, session.user.email);
         } else {
+          console.log('[Auth] initAuth: no session → setLoading(false)');
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error getting session:', error);
-        if (mounted) {
-          setLoading(false);
-        }
+        console.error('[Auth] Error getting session:', error);
+        if (mounted) setLoading(false);
       }
     };
 
@@ -70,11 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+      console.log('[Auth] onAuthStateChange event:', event, '| session:', session);
 
       setSession(session);
       if (session?.user) {
+        console.log('[Auth] onAuthStateChange: fetching user data...');
         await fetchUserData(session.user.id, session.user.email);
       } else {
+        console.log('[Auth] onAuthStateChange: no session → clearing user');
         setUser(null);
         setLoading(false);
       }
@@ -87,18 +97,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchUserData]);
 
   async function signIn(email: string, password: string) {
+    console.log('[Auth] signIn called with email:', email);
     try {
-      //setLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[Auth] signIn error:', error);
       return { error: error as Error | null };
     } catch (error) {
+      console.error('[Auth] signIn caught error:', error);
       return { error: error as Error };
     }
   }
 
   async function signUp(email: string, password: string, role: 'club' | 'fan', name?: string) {
     try {
-      setLoading(true);
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         setLoading(false);
@@ -125,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('[Auth] Error signing out:', error);
     }
   }
 
