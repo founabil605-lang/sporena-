@@ -1,12 +1,15 @@
-import { ChartBar as BarChart3, TrendingUp, Star, Users, Plus } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import { ClubSidebar } from "../../components/ClubSidebar";
 import { ClubTopbar } from "../../components/ClubTopbar";
 import { Footer } from "../../components/Footer";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const ClubDashboard = () => {
+  const { user } = useAuth();
+
   const stats = [
-    { label: "CA Total", value: "12,450 €", change: "+12.5%", icon: "💰", color: "bg-green-50" },
-    { label: "Réservations", value: "42", change: "+4%", icon: "📅", color: "bg-blue-50" },
+    { label: "CA Total", value: "12,450 EUR", change: "+12.5%", icon: "💰", color: "bg-green-50" },
+    { label: "Reservations", value: "42", change: "+4%", icon: "📅", color: "bg-blue-50" },
     { label: "Taux remplissage", value: "85%", change: "Steady", icon: "📊", color: "bg-red-50" },
     { label: "Note moyenne", value: "4.9 ★", change: "", icon: "⭐", color: "bg-yellow-50" },
   ];
@@ -17,8 +20,8 @@ export const ClubDashboard = () => {
       client: "Jean Dupont",
       experience: "Tennis VIP - Terre Battue",
       date: "12 Oct 2024",
-      status: "Confirmé",
-      amount: "120 €",
+      status: "Confirme",
+      amount: "120 EUR",
     },
     {
       id: 2,
@@ -26,31 +29,33 @@ export const ClubDashboard = () => {
       experience: "Yoga Sunrise Roof",
       date: "14 Oct 2024",
       status: "En attente",
-      amount: "45 €",
+      amount: "45 EUR",
     },
     {
       id: 3,
       client: "Marc Lefebvre",
       experience: "Coaching Padel Pro",
       date: "15 Oct 2024",
-      status: "Confirmé",
-      amount: "85 €",
+      status: "Confirme",
+      amount: "85 EUR",
     },
   ];
 
+  const clubName = user?.club_name || "Mon Club";
+
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar clubName="Club Elite Paris" userRole="Premium Host" />
+      <ClubSidebar />
 
       <div className="flex-1 flex flex-col">
-        <ClubTopbar userName="Thomas Müller" tier="ELITE PARTNER" />
+        <ClubTopbar />
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase">Vue d'ensemble</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Tableau de Bord</h1>
-              <p className="text-gray-600">Bienvenue, Club Elite Paris. Voici l'état de vos expériences et revenus pour ce mois.</p>
+              <p className="text-gray-600">Bienvenue, {clubName}. Voici l'etat de vos experiences et revenus pour ce mois.</p>
             </div>
 
             <div className="flex gap-4 mb-8">
@@ -60,7 +65,7 @@ export const ClubDashboard = () => {
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#00694c] text-white hover:bg-[#005a40] text-sm font-medium transition-colors">
                 <span>📊</span>
-                Disponibilités
+                Disponibilites
               </button>
             </div>
 
@@ -86,7 +91,7 @@ export const ClubDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-bold text-lg text-gray-900">Réservations récentes</h2>
+                  <h2 className="font-bold text-lg text-gray-900">Reservations recentes</h2>
                   <button className="text-[#00694c] text-sm font-semibold hover:underline">Voir tout</button>
                 </div>
                 <div className="overflow-x-auto">
@@ -94,7 +99,7 @@ export const ClubDashboard = () => {
                     <thead>
                       <tr className="border-b border-gray-100">
                         <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Client</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Expérience</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Experience</th>
                         <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Date</th>
                         <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Statut</th>
                         <th className="text-left py-3 px-4 font-semibold text-gray-600 text-xs uppercase tracking-wider">Montant</th>
@@ -115,7 +120,7 @@ export const ClubDashboard = () => {
                           <td className="py-4 px-4 text-gray-600">{booking.date}</td>
                           <td className="py-4 px-4">
                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                              booking.status === "Confirmé"
+                              booking.status === "Confirme"
                                 ? "bg-green-100 text-green-700"
                                 : "bg-blue-100 text-blue-700"
                             }`}>
@@ -138,11 +143,11 @@ export const ClubDashboard = () => {
                   </div>
                   <p className="text-sm text-[#d4f5e9] mb-1">Top Performing</p>
                   <h3 className="font-black text-2xl mb-4">Master Padel Class</h3>
-                  <p className="text-xs text-[#d4f5e9] mb-4">Prochaine séance : Samedi à 10h00</p>
+                  <p className="text-xs text-[#d4f5e9] mb-4">Prochaine seance : Samedi a 10h00</p>
                   <div className="flex items-center justify-between">
-                    <span className="font-black text-2xl">95 € <span className="text-xs font-normal text-[#d4f5e9]">/pers.</span></span>
+                    <span className="font-black text-2xl">95 EUR <span className="text-xs font-normal text-[#d4f5e9]">/pers.</span></span>
                     <button className="bg-white text-[#00694c] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors">
-                      Gérer
+                      Gerer
                     </button>
                   </div>
                 </div>
@@ -186,17 +191,17 @@ export const ClubDashboard = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp size={20} className="text-[#00694c]" />
-                    <h3 className="font-bold text-gray-900">Boostez votre visibilité</h3>
+                    <h3 className="font-bold text-gray-900">Boostez votre visibilite</h3>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">
-                    Les expériences avec au moins 5 photos haute résolution ont un taux de conversion 40% plus élevé. Vérifiez vos galeries photos pour maximiser vos réservations.
+                    Les experiences avec au moins 5 photos haute resolution ont un taux de conversion 40% plus eleve. Verifiez vos galeries photos pour maximiser vos reservations.
                   </p>
                   <button className="text-[#00694c] font-semibold text-sm hover:underline">Optimiser mes fiches →</button>
                 </div>
                 <div className="bg-gray-900 rounded-lg text-white p-6">
                   <h3 className="font-bold mb-2">Besoin d'aide ?</h3>
                   <p className="text-sm text-gray-400 mb-4">
-                    Notre équipe de conciergerie Club est disponible 7j/7 pour vous accompagner dans le paramétrage de vos offres premium et créneaux spécifiques.
+                    Notre equipe de conciergerie Club est disponible 7j/7 pour vous accompagner dans le parametrage de vos offres premium et creneaux specifiques.
                   </p>
                   <button className="text-white font-semibold text-sm hover:underline">Contacter un expert →</button>
                 </div>

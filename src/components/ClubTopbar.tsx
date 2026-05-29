@@ -1,12 +1,12 @@
-import { Search, Bell, CircleHelp as HelpCircle, User } from "lucide-react";
+import { Search, Bell, CircleHelp as HelpCircle } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
-interface ClubTopbarProps {
-  userName: string;
-  userImage?: string;
-  tier?: string;
-}
+export const ClubTopbar = () => {
+  const { user } = useAuth();
 
-export const ClubTopbar = ({ userName, userImage, tier = "ELITE PARTNER" }: ClubTopbarProps) => {
+  const userName = user?.email?.split('@')[0] || "Utilisateur";
+  const tier = "ELITE PARTNER";
+
   return (
     <div className="bg-white border-b border-gray-100 h-16 sticky top-0 z-40 flex items-center justify-between px-8">
       <div className="flex items-center gap-4 flex-1">
@@ -15,7 +15,7 @@ export const ClubTopbar = ({ userName, userImage, tier = "ELITE PARTNER" }: Club
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Rechercher une expérience..."
+              placeholder="Rechercher une experience..."
               className="w-full bg-gray-50 border border-gray-100 rounded-lg pl-10 pr-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-[#00694c]"
             />
           </div>
@@ -36,7 +36,7 @@ export const ClubTopbar = ({ userName, userImage, tier = "ELITE PARTNER" }: Club
             <p className="text-xs text-gray-400 font-medium">{tier}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00694c] to-[#003d2d] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            {userImage ? <img src={userImage} alt="" className="w-full h-full rounded-full object-cover" /> : userName[0]}
+            {userName[0].toUpperCase()}
           </div>
         </div>
       </div>

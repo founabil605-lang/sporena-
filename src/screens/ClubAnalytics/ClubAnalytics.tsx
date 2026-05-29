@@ -1,11 +1,13 @@
-import { TrendingUp, ChartBar as BarChart3, Star, Users } from "lucide-react";
 import { ClubSidebar } from "../../components/ClubSidebar";
 import { ClubTopbar } from "../../components/ClubTopbar";
 import { Footer } from "../../components/Footer";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const ClubAnalytics = () => {
+  const { user } = useAuth();
+
   const stats = [
-    { label: "Monthly Revenue", value: "€24,450", change: "+12.4%", icon: "💰" },
+    { label: "Monthly Revenue", value: "24,450 EUR", change: "+12.4%", icon: "💰" },
     { label: "Booking Growth %", value: "64.5%", change: "+8.2%", icon: "📈" },
     { label: "Average Rating", value: "4.92 /5", change: "Steady", icon: "⭐" },
   ];
@@ -23,12 +25,14 @@ export const ClubAnalytics = () => {
     { age: "45+ YEARS", percent: "20%" },
   ];
 
+  const clubName = user?.club_name || "Mon Club";
+
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar clubName="Club Elite Paris" userRole="Premium Host" />
+      <ClubSidebar />
 
       <div className="flex-1 flex flex-col">
-        <ClubTopbar userName="Alexandre Durand" tier="ELITE PARTNER" />
+        <ClubTopbar />
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">

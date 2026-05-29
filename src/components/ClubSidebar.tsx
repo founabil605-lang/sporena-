@@ -1,23 +1,29 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutGrid, Sparkles, Calendar, ChartBar as BarChart3, Gift, Settings, LogOut, Bell, CircleHelp as HelpCircle } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
-interface ClubSidebarProps {
-  clubName: string;
-  userRole: string;
-}
-
-export const ClubSidebar = ({ clubName, userRole }: ClubSidebarProps) => {
+export const ClubSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const menuItems = [
     { label: "Vue d'ensemble", icon: LayoutGrid, path: "/club/dashboard" },
-    { label: "Mes expériences", icon: Sparkles, path: "/club/experiences" },
-    { label: "Réservations", icon: Calendar, path: "/club/bookings" },
+    { label: "Mes experiences", icon: Sparkles, path: "/club/experiences" },
+    { label: "Reservations", icon: Calendar, path: "/club/bookings" },
     { label: "Analytics", icon: BarChart3, path: "/club/analytics" },
     { label: "Abonnement", icon: Gift, path: "/club/subscription" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  const clubName = user?.club_name || "Mon Club";
+  const userRole = "Premium Host";
 
   return (
     <aside className="w-64 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0">
@@ -61,7 +67,7 @@ export const ClubSidebar = ({ clubName, userRole }: ClubSidebarProps) => {
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors">
           <Settings size={18} />
-          <span>Paramètres</span>
+          <span>Parametres</span>
         </button>
       </div>
 
@@ -71,9 +77,12 @@ export const ClubSidebar = ({ clubName, userRole }: ClubSidebarProps) => {
           <p className="font-semibold text-gray-900 text-sm mt-0.5">{clubName}</p>
           <p className="text-xs text-gray-500">{userRole}</p>
         </div>
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 text-sm font-medium transition-colors border border-gray-200">
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 text-sm font-medium transition-colors border border-gray-200"
+        >
           <LogOut size={16} />
-          <span>Déconnexion</span>
+          <span>Deconnexion</span>
         </button>
       </div>
     </aside>
