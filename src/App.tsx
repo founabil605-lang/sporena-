@@ -14,6 +14,7 @@ import { ClubDashboard } from "./screens/ClubDashboard";
 import { ClubExperiences } from "./screens/ClubExperiences";
 import { ClubBookings } from "./screens/ClubBookings";
 import { ClubAnalytics } from "./screens/ClubAnalytics";
+import { CreateExperience } from "./screens/CreateExperience";
 
 export const App = () => {
   return (
@@ -60,6 +61,14 @@ export const App = () => {
             element={
               <ProtectedRoute requiredRole="club">
                 <ClubAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/club/experiences/create"
+            element={
+              <ProtectedRoute requiredRole="club">
+                <CreateExperience />
               </ProtectedRoute>
             }
           />

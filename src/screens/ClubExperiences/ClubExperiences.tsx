@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CreditCard as Edit2, Copy, Plus, Eye, ChevronRight } from "lucide-react";
 import { ClubSidebar } from "../../components/ClubSidebar";
 import { ClubTopbar } from "../../components/ClubTopbar";
@@ -6,6 +7,7 @@ import { Footer } from "../../components/Footer";
 import { useAuth } from "../../contexts/AuthContext";
 
 export const ClubExperiences = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [filter, setFilter] = useState("Toutes");
 
@@ -100,7 +102,10 @@ export const ClubExperiences = () => {
                   </button>
                 ))}
               </div>
-              <button className="ml-auto flex items-center gap-2 px-5 py-2 rounded-lg bg-[#00694c] text-white hover:bg-[#005a40] font-semibold text-sm transition-colors">
+              <button
+                onClick={() => navigate("/club/experiences/create")}
+                className="ml-auto flex items-center gap-2 px-5 py-2 rounded-lg bg-[#00694c] text-white hover:bg-[#005a40] font-semibold text-sm transition-colors"
+              >
                 <Plus size={16} />
                 Creer une experience
               </button>
