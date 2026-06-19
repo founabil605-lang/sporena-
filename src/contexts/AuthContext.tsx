@@ -99,9 +99,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signIn(email: string, password: string) {
     console.log('[Auth] signIn called with email:', email);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       console.log('[Auth] signIn error:', error);
-      return { error: error as Error | null };
+      if (error) {
+        return { error: error as Error };
+      }
+      if (data.user) {
+        setSession(data.session);
+        await fetchUserData(data.user.id, data.user.email);
+      }
+      return { error: null };
     } catch (error) {
       console.error('[Auth] signIn caught error:', error);
       return { error: error as Error };
