@@ -75,14 +75,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       console.log('[Auth] onAuthStateChange event:', event, '| session:', session);
 
       setSession(session);
       if (session?.user) {
         console.log('[Auth] onAuthStateChange: fetching user data...');
-        await fetchUserData(session.user.id, session.user.email);
+        (async () => {
+          await fetchUserData(session.user.id, session.user.email);
+        })();
       } else {
         console.log('[Auth] onAuthStateChange: no session → clearing user');
         setUser(null);
@@ -99,15 +101,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signIn(email: string, password: string) {
     console.log('[Auth] signIn called with email:', email);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       console.log('[Auth] signIn error:', error);
       if (error) {
         return { error: error as Error };
       }
-      if (data.user) {
-        setSession(data.session);
-        await fetchUserData(data.user.id, data.user.email);
-      }
+      // onAuthStateChange will set user and loading=false
       return { error: null };
     } catch (error) {
       console.error('[Auth] signIn caught error:', error);
@@ -127,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           user_id: data.user.id,
           name: name,
         });
-        // After signUp, sign in automatically to set session
+        // After signUp, sign in automatically to trigger onAuthStateChange
         return signIn(email, password);
       }
 
