@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,24 +13,26 @@ export const ClubLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'club') {
+        navigate('/club/dashboard');
+      } else {
+        setError('Ce compte n\'est pas un compte club.');
+      }
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      console.log('[ClubLogin] 1. Calling signIn...');
       const result = await signIn(email, password);
-      console.log('[ClubLogin] 2. signIn result:', result);
-      console.log('[ClubLogin] 3. user state at this point:', user);
-
+      setLoading(false);
       if (result.error) {
-        console.log('[ClubLogin] 4. Error returned:', result.error.message);
         setError(result.error.message || 'Email ou mot de passe incorrect');
-        setLoading(false);
-      } else {
-        console.log('[ClubLogin] 4. Success → navigating to /club/dashboard');
-        navigate('/club/dashboard');
       }
     } catch (err) {
       console.error('[ClubLogin] caught exception:', err);

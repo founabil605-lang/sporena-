@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Building2, Phone } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,7 +6,7 @@ import { Footer } from '../../components/Footer';
 
 export const ClubRegister = () => {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, user } = useAuth();
   const [clubName, setClubName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -16,6 +16,14 @@ export const ClubRegister = () => {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'club') {
+        navigate('/club/dashboard');
+      }
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +50,6 @@ export const ClubRegister = () => {
 
     if (result.error) {
       setError(result.error.message || 'Erreur lors de l\'inscription');
-    } else {
-      navigate('/club/dashboard');
     }
   };
 

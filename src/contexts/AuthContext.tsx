@@ -119,7 +119,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        setLoading(false);
         return { error: error as Error };
       }
 
@@ -128,11 +127,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           user_id: data.user.id,
           name: name,
         });
+        // After signUp, sign in automatically to set session
+        return signIn(email, password);
       }
 
       return { error: null };
     } catch (error) {
-      setLoading(false);
       return { error: error as Error };
     }
   }

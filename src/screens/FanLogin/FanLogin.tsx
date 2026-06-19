@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,12 +6,18 @@ import { Footer } from '../../components/Footer';
 
 export const FanLogin = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +29,6 @@ export const FanLogin = () => {
 
     if (result.error) {
       setError(result.error.message || 'Email ou mot de passe incorrect');
-    } else {
-      navigate('/');
     }
   };
 
