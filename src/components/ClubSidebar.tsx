@@ -12,7 +12,8 @@ export const ClubSidebar = () => {
     { label: "Mes experiences", icon: Sparkles, path: "/club/experiences" },
     { label: "Reservations", icon: Calendar, path: "/club/bookings" },
     { label: "Analytics", icon: BarChart3, path: "/club/analytics" },
-    { label: "Abonnement", icon: Gift, path: "/club/subscription" },
+    { label: "Abonnement", icon: Gift, path: "/club/abonnement" },
+    { label: "Parametres", icon: Settings, path: "/club/parametres" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -65,10 +66,7 @@ export const ClubSidebar = () => {
           <HelpCircle size={18} />
           <span>Support</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors">
-          <Settings size={18} />
-          <span>Parametres</span>
-        </button>
+
       </div>
 
       <div className="p-4 border-t border-gray-100 bg-gray-50 space-y-3">

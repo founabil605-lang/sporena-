@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Calendar, ChevronRight, ChevronLeft, TrendingUp } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ExperienceCard } from "../../components/ExperienceCard";
-import { experiences, categories, partners } from "../../data/experiences";
+import { categories, partners } from "../../data/experiences";
+import { supabase } from "../../lib/supabase";
+
+const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800";
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -12,9 +15,45 @@ export const HomePage = () => {
   const [city, setCity] = useState("");
   const [date, setDate] = useState("");
   const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [experiencesList, setExperiencesList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const featured = experiences.slice(0, 3);
-  const trending = experiences.slice(6, 10);
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("club_experiences")
+        .select("*, clubs(name, logo_url)")
+        .eq("status", "public")
+        .order("created_at", { ascending: false });
+      if (data) {
+        setExperiencesList(data.map((exp: any) => ({
+          id: exp.id,
+          image: exp.images?.[0] || exp.image_url || DEFAULT_IMAGE,
+          category: exp.category,
+          title: exp.title,
+          club: exp.clubs?.name || "Club",
+          date: exp.date || "Date à définir",
+          location: exp.location || "Paris",
+          price: exp.price || 0,
+          rating: exp.rating || 4.5,
+          reviewCount: exp.review_count || 0,
+          spotsLeft: (exp.slots_total || 0) - (exp.slots_booked || 0),
+          certified: exp.certified || false,
+          images: exp.images || [],
+          description: exp.description || "",
+          includes: exp.includes || [],
+          tags: exp.tags || [],
+          address: exp.address || "",
+          time: exp.time || "",
+          organizer: exp.organizer || "",
+          organizerRating: exp.organizer_rating || 4.5,
+          organizerExperiences: exp.organizer_experiences || 0,
+        })));
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +63,9 @@ export const HomePage = () => {
     if (date) params.set("date", date);
     navigate(`/search?${params.toString()}`);
   };
+
+  const featured = experiencesList.slice(0, 3);
+  const trending = experiencesList.slice(6, 10);
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
@@ -103,11 +145,17 @@ export const HomePage = () => {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featured.map((exp) => (
-            <ExperienceCard key={exp.id} {...exp} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featured.map((exp) => (
+              <ExperienceCard key={exp.id} {...exp} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="bg-white py-16">
@@ -138,52 +186,62 @@ export const HomePage = () => {
           <TrendingUp size={20} className="text-[#d14405]" />
           <h2 className="text-2xl font-black text-gray-900">Trending cette semaine</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div
-            onClick={() => navigate(`/experience/${trending[0]?.id}`)}
-            className="relative rounded-2xl overflow-hidden cursor-pointer group"
-            style={{ minHeight: 360 }}
-          >
-            <img
-              src={trending[0]?.image}
-              alt={trending[0]?.title}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute top-4 left-4">
-              <span className="bg-[#d14405] text-white text-[10px] font-bold tracking-wider px-3 py-1 rounded-full uppercase">Populaire</span>
-            </div>
-            <div className="absolute bottom-6 left-6 right-6 text-white">
-              <h3 className="font-black text-xl mb-1">{trending[0]?.title}</h3>
-              <p className="text-sm text-gray-300 line-clamp-2">{trending[0]?.description}</p>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              onClick={() => navigate(`/experience/${trending[0]?.id}`)}
+              className="relative rounded-2xl overflow-hidden cursor-pointer group"
+              style={{ minHeight: 360 }}
+            >
+              {trending[0] && (
+                <>
+                  <img
+                    src={trending[0].image}
+                    alt={trending[0].title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-[#d14405] text-white text-[10px] font-bold tracking-wider px-3 py-1 rounded-full uppercase">Populaire</span>
+                  </div>
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <h3 className="font-black text-xl mb-1">{trending[0].title}</h3>
+                    <p className="text-sm text-gray-300 line-clamp-2">{trending[0].description}</p>
+                  </div>
+                </>
+              )}
+            </div>
 
-          <div className="flex flex-col gap-4">
-            {trending.slice(1, 3).map((exp) => (
-              <div
-                key={exp.id}
-                onClick={() => navigate(`/experience/${exp.id}`)}
-                className="relative rounded-2xl overflow-hidden cursor-pointer group flex-1"
-                style={{ minHeight: 168 }}
-              >
-                <img
-                  src={exp.image}
-                  alt={exp.title}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute top-3 left-3">
-                  <span className="bg-[#d14405] text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full uppercase">Populaire</span>
+            <div className="flex flex-col gap-4">
+              {trending.slice(1, 3).map((exp) => (
+                <div
+                  key={exp.id}
+                  onClick={() => navigate(`/experience/${exp.id}`)}
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group flex-1"
+                  style={{ minHeight: 168 }}
+                >
+                  <img
+                    src={exp.image}
+                    alt={exp.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-[#d14405] text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full uppercase">Populaire</span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <h3 className="font-bold text-sm">{exp.title}</h3>
+                    <p className="text-xs text-gray-300">A partir de {exp.price}€</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h3 className="font-bold text-sm">{exp.title}</h3>
-                  <p className="text-xs text-gray-300">A partir de {exp.price}€</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       <section className="bg-white py-10">
@@ -203,21 +261,9 @@ export const HomePage = () => {
           <p className="text-gray-500 text-sm mb-12">En trois étapes simples, accédez à l'exceptionnel.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              {
-                icon: "🔍",
-                title: "Cherchez",
-                desc: "Explorez des centaines d'expériences uniques filtrées par sport, date et localisation.",
-              },
-              {
-                icon: "📅",
-                title: "Réservez",
-                desc: "Paiement sécurisé et confirmation immédiate. Votre accès VIP est garanti par Sporena.",
-              },
-              {
-                icon: "🏆",
-                title: "Vivez",
-                desc: "Présentez-vous le jour J et vivez un moment inoubliable au cœur de votre passion.",
-              },
+              { icon: "🔍", title: "Cherchez", desc: "Explorez des centaines d'expériences uniques filtrées par sport, date et localisation." },
+              { icon: "📅", title: "Réservez", desc: "Paiement sécurisé et confirmation immédiate. Votre accès VIP est garanti par Sporena." },
+              { icon: "🏆", title: "Vivez", desc: "Présentez-vous le jour J et vivez un moment inoubliable au cœur de votre passion." },
             ].map((step) => (
               <div key={step.title} className="flex flex-col items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-[#00694c] flex items-center justify-center text-2xl">

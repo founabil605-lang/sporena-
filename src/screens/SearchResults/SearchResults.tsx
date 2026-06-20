@@ -1,12 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Calendar, ChevronDown, Map, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { ExperienceCard } from "../../components/ExperienceCard";
-import { experiences, sports } from "../../data/experiences";
+import { sports } from "../../data/experiences";
+import { supabase } from "../../lib/supabase";
 
 const SORT_OPTIONS = ["Pertinence", "Prix croissant", "Prix décroissant", "Mieux notés"];
+
+const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800";
 
 export const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +23,45 @@ export const SearchResults = () => {
   const [distance, setDistance] = useState("Moins de 5 km");
   const [sort, setSort] = useState("Pertinence");
   const [sortOpen, setSortOpen] = useState(false);
+  const [experiencesList, setExperiencesList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("club_experiences")
+        .select("*, clubs(name, logo_url)")
+        .eq("status", "public")
+        .order("created_at", { ascending: false });
+      if (data) {
+        setExperiencesList(data.map((exp: any) => ({
+          id: exp.id,
+          image: exp.images?.[0] || exp.image_url || DEFAULT_IMAGE,
+          category: exp.category,
+          title: exp.title,
+          club: exp.clubs?.name || "Club",
+          date: exp.date || "Date à définir",
+          location: exp.location || "Paris",
+          price: exp.price || 0,
+          rating: exp.rating || 4.5,
+          reviewCount: exp.review_count || 0,
+          spotsLeft: (exp.slots_total || 0) - (exp.slots_booked || 0),
+          certified: exp.certified || false,
+          images: exp.images || [],
+          description: exp.description || "",
+          includes: exp.includes || [],
+          tags: exp.tags || [],
+          address: exp.address || "",
+          time: exp.time || "",
+          organizer: exp.organizer || "",
+          organizerRating: exp.organizer_rating || 4.5,
+          organizerExperiences: exp.organizer_experiences || 0,
+        })));
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, []);
 
   const toggleSport = (s: string) => {
     setSelectedSports((prev) =>
@@ -28,16 +70,16 @@ export const SearchResults = () => {
   };
 
   const filtered = useMemo(() => {
-    let list = experiences.filter((e) => e.price >= priceMin && e.price <= priceMax);
+    let list = experiencesList.filter((e) => e.price >= priceMin && e.price <= priceMax);
     if (selectedSports.length > 0) {
-      list = list.filter((e) => selectedSports.some((s) => e.sport.toLowerCase().includes(s.toLowerCase()) || e.title.toLowerCase().includes(s.toLowerCase())));
+      list = list.filter((e) => selectedSports.some((s) => e.sport?.toLowerCase().includes(s.toLowerCase()) || e.title?.toLowerCase().includes(s.toLowerCase())));
     }
     if (available) list = list.filter((e) => e.spotsLeft > 0);
     if (sort === "Prix croissant") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "Prix décroissant") list = [...list].sort((a, b) => b.price - a.price);
     if (sort === "Mieux notés") list = [...list].sort((a, b) => b.rating - a.rating);
     return list;
-  }, [priceMin, priceMax, selectedSports, available, sort]);
+  }, [priceMin, priceMax, selectedSports, available, sort, experiencesList]);
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
@@ -178,13 +220,19 @@ export const SearchResults = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {filtered.map((exp) => (
-              <ExperienceCard key={exp.id} {...exp} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {filtered.map((exp) => (
+                <ExperienceCard key={exp.id} {...exp} />
+              ))}
+            </div>
+          )}
 
-          {filtered.length === 0 && (
+          {!loading && filtered.length === 0 && (
             <div className="text-center py-20">
               <SlidersHorizontal size={40} className="text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 font-medium">Aucune expérience trouvée</p>

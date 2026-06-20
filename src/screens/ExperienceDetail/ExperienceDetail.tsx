@@ -1,24 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MapPin, Calendar, ChevronDown, Star, CircleCheck as CheckCircle, Users, Shield, ChevronRight } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
-import { experiences } from "../../data/experiences";
+import { supabase } from "../../lib/supabase";
+
+const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800";
 
 export const ExperienceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const exp = experiences.find((e) => e.id === id) || experiences[3];
-
-  const [selectedDate, setSelectedDate] = useState(exp.date.replace("Sam. ", "2024-11-").replace(" Nov. 2024", "").trim());
-  const [selectedTime, setSelectedTime] = useState(exp.time);
+  const [exp, setExp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
 
-  const priceHT = Math.round(exp.price / 1.2 * 100) / 100;
-  const tva = exp.price - priceHT;
+  useEffect(() => {
+    const fetch = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from("club_experiences")
+        .select("*, clubs(name, logo_url)")
+        .eq("id", id)
+        .single();
+      if (data) {
+        const mapped = {
+          id: data.id,
+          title: data.title,
+          club: data.clubs?.name || "Club",
+          category: data.category,
+          sport: data.sport,
+          price: data.price || 0,
+          rating: data.rating || 4.5,
+          reviewCount: data.review_count || 0,
+          date: data.date || "Date à définir",
+          time: data.time || "Heure à définir",
+          location: data.location || "Paris",
+          address: data.address || "",
+          images: data.images || [data.image_url || DEFAULT_IMAGE],
+          spotsLeft: (data.slots_total || 0) - (data.slots_booked || 0),
+          totalSpots: data.slots_total || 0,
+          certified: data.certified || false,
+          description: data.description || "",
+          includes: data.includes || [],
+          tags: data.tags || [],
+          organizer: data.organizer || "",
+          organizerRating: data.organizer_rating || 4.5,
+          organizerExperiences: data.organizer_experiences || 0,
+        };
+        setExp(mapped);
+        setSelectedDate(mapped.date);
+        setSelectedTime(mapped.time);
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, [id]);
 
   const handleBook = () => {
+    if (!exp) return;
     navigate(`/checkout/${exp.id}`);
   };
 
@@ -27,15 +69,37 @@ export const ExperienceDetail = () => {
       name: "Marc-Antoine D.",
       date: "Visité en Octobre 2023",
       rating: 5,
-      text: "Une expérience absolument mémorable. L'accès au bord de pelouse juste avant l'entrée des joueurs est un moment suspendu. L'organisation Sporena est impeccable du début à la fin.",
+      text: "Une expérience absolument mémorable. L'organisation Sporena est impeccable du début à la fin.",
     },
     {
       name: "Sophie L.",
       date: "Visité il y a 2 semaines",
       rating: 5,
-      text: "Le traiteur dans la loge était exceptionnel. Seul bémol, la visite des vestiaires est passée un peu vite, mais les anecdotes du guide compensent largement !",
+      text: "Le traiteur dans la loge était exceptionnel. Les anecdotes du guide compensent largement !",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!exp) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 font-medium">Expérience non trouvée</p>
+          <button onClick={() => navigate("/")} className="mt-4 text-[#00694c] font-semibold hover:underline">Retour à l'accueil</button>
+        </div>
+      </div>
+    );
+  }
+
+  const priceHT = Math.round(exp.price / 1.2 * 100) / 100;
+  const tva = exp.price - priceHT;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -44,24 +108,19 @@ export const ExperienceDetail = () => {
       <div className="relative">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1 max-h-[480px] overflow-hidden">
           <div className="relative overflow-hidden cursor-pointer" onClick={() => { setActiveImg(0); setGalleryOpen(true); }}>
-            <img src={exp.images[0]} alt={exp.title} className="w-full h-full object-cover" style={{ maxHeight: 480 }} />
+            <img src={exp.images[0] || DEFAULT_IMAGE} alt={exp.title} className="w-full h-full object-cover" style={{ maxHeight: 480 }} />
             <div className="absolute bottom-4 left-4 flex gap-2">
-              {exp.tags.map((tag) => (
+              {exp.tags.map((tag: string) => (
                 <span key={tag} className="bg-[#00694c] text-white text-xs font-bold px-3 py-1 rounded-full">{tag}</span>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-1">
-            {exp.images.slice(1, 5).map((img, i) => (
+            {exp.images.slice(1, 5).map((img: string, i: number) => (
               <div key={i} className="relative overflow-hidden cursor-pointer" onClick={() => { setActiveImg(i + 1); setGalleryOpen(true); }}>
                 <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" style={{ maxHeight: 238 }} />
                 {i === 3 && exp.images.length > 5 && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">Voir toutes les photos</span>
-                  </div>
-                )}
-                {i === 3 && exp.images.length === 5 && (
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <span className="text-white font-semibold text-sm">Voir toutes les photos</span>
                   </div>
                 )}
@@ -96,7 +155,7 @@ export const ExperienceDetail = () => {
               <div className="mt-8">
                 <h3 className="font-bold text-base text-gray-900 mb-3">Inclus dans ce pack :</h3>
                 <ul className="flex flex-col gap-2">
-                  {exp.includes.map((item) => (
+                  {exp.includes.map((item: string) => (
                     <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
                       <CheckCircle size={14} className="text-[#00694c] flex-shrink-0" />
                       {item}
@@ -227,7 +286,7 @@ export const ExperienceDetail = () => {
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Organisé par</p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-[#00694c] text-sm">{exp.organizer}</p>
+                    <p className="font-bold text-[#00694c] text-sm">{exp.organizer || exp.club}</p>
                     <div className="flex items-center gap-1 mt-0.5">
                       <Star size={11} className="fill-amber-400 text-amber-400" />
                       <span className="text-xs text-gray-600">{exp.organizerRating} • {exp.organizerExperiences} expériences créées</span>

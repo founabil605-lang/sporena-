@@ -15,6 +15,8 @@ import { ClubExperiences } from "./screens/ClubExperiences";
 import { ClubBookings } from "./screens/ClubBookings";
 import { ClubAnalytics } from "./screens/ClubAnalytics";
 import { CreateExperience } from "./screens/CreateExperience";
+import { Parametre } from "./screens/Parametre";
+import { Abonnement } from "./screens/Abonnement";
 
 export const App = () => {
   return (
@@ -69,6 +71,22 @@ export const App = () => {
             element={
               <ProtectedRoute requiredRole="club">
                 <CreateExperience />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/club/parametres"
+            element={
+              <ProtectedRoute requiredRole="club">
+                <Parametre />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/club/abonnement"
+            element={
+              <ProtectedRoute requiredRole="club">
+                <Abonnement />
               </ProtectedRoute>
             }
           />
