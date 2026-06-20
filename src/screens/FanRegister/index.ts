@@ -1,0 +1,1 @@
+export { FanRegister } from "./FanRegister";

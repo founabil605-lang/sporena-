@@ -35,7 +35,7 @@ export const AuthChoice = () => {
             </button>
 
             <button
-              onClick={() => navigate("/auth/fan-login")}
+              onClick={() => navigate("/fan/login")}
               className="group relative overflow-hidden rounded-3xl bg-white p-8 transition-all hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#00694c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

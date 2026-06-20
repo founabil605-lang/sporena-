@@ -10,6 +10,7 @@ import { AuthChoice } from "./screens/AuthChoice";
 import { ClubLogin } from "./screens/ClubLogin";
 import { ClubRegister } from "./screens/ClubRegister";
 import { FanLogin } from "./screens/FanLogin";
+import { FanRegister } from "./screens/FanRegister";
 import { FanDashboard } from "./screens/FanDashboard";
 import { FanReviews } from "./screens/FanReviews";
 import { FanFavorites } from "./screens/FanFavorites";
@@ -38,6 +39,7 @@ export const App = () => {
           <Route path="/auth/club-login" element={<ClubLogin />} />
           <Route path="/auth/club-register" element={<ClubRegister />} />
           <Route path="/auth/fan-login" element={<FanLogin />} />
+          <Route path="/auth/fan-register" element={<FanRegister />} />
 
           <Route
             path="/club/dashboard"
