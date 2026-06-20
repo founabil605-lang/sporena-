@@ -6,26 +6,30 @@ import { Footer } from '../../components/Footer';
 
 export const FanLogin = () => {
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
+  const { signIn, user, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (!loading && user) {
+      if (user.role === 'club') {
+        navigate('/club/dashboard');
+      } else {
+        navigate('/fan/dashboard');
+      }
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setSubmitting(true);
 
     const result = await signIn(email, password);
-    setLoading(false);
+    setSubmitting(false);
 
     if (result.error) {
       setError(result.error.message || 'Email ou mot de passe incorrect');
@@ -106,10 +110,10 @@ export const FanLogin = () => {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={submitting}
                 className="w-full bg-[#00694c] hover:bg-[#005a40] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl transition-colors mt-2"
               >
-                {loading ? 'Connexion...' : 'Se connecter'}
+                {submitting ? 'Connexion...' : 'Se connecter'}
               </button>
             </form>
 

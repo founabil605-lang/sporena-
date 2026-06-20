@@ -26,7 +26,7 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
 
   if (!user) {
     console.log('[ProtectedRoute] no user → redirecting to login');
-    const redirectTo = requiredRole === 'club' ? '/auth/club-login' : '/auth/fan-login';
+    const redirectTo = requiredRole === 'club' ? '/auth/club-login' : '/fan/login';
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 

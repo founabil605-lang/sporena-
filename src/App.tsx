@@ -10,6 +10,11 @@ import { AuthChoice } from "./screens/AuthChoice";
 import { ClubLogin } from "./screens/ClubLogin";
 import { ClubRegister } from "./screens/ClubRegister";
 import { FanLogin } from "./screens/FanLogin";
+import { FanDashboard } from "./screens/FanDashboard";
+import { FanReviews } from "./screens/FanReviews";
+import { FanFavorites } from "./screens/FanFavorites";
+import { FanSettings } from "./screens/FanSettings";
+import { FanCancel } from "./screens/FanCancel";
 import { ClubDashboard } from "./screens/ClubDashboard";
 import { ClubExperiences } from "./screens/ClubExperiences";
 import { ClubBookings } from "./screens/ClubBookings";
@@ -87,6 +92,49 @@ export const App = () => {
             element={
               <ProtectedRoute requiredRole="club">
                 <Abonnement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fan Space Routes */}
+          <Route path="/fan/login" element={<FanLogin />} />
+          <Route
+            path="/fan/dashboard"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/reviews"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanReviews />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/favorites"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanFavorites />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/settings"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/cancel/:id"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanCancel />
               </ProtectedRoute>
             }
           />

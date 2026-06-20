@@ -1,0 +1,1 @@
+export { FanFavorites } from "./FanFavorites";
