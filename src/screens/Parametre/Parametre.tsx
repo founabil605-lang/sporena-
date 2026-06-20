@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Users, Bell, Shield, Check, Upload, Save, TriangleAlert as AlertTriangle, Eye, Globe, MapPin, FileText } from "lucide-react";
+import { Building2, Users, Bell, Shield, Save, TriangleAlert as AlertTriangle, Globe, MapPin, FileText, Plus, X } from "lucide-react";
 import { ClubSidebar } from "../../components/ClubSidebar";
 import { ClubTopbar } from "../../components/ClubTopbar";
 import { Footer } from "../../components/Footer";
@@ -22,7 +22,6 @@ export const Parametre = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  // Profile
   const [clubName, setClubName] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
@@ -30,20 +29,33 @@ export const Parametre = () => {
   const [phone, setPhone] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
 
-  // Notifications
   const [notifReservations, setNotifReservations] = useState(true);
   const [notifReviews, setNotifReviews] = useState(true);
   const [notifMarketing, setNotifMarketing] = useState(false);
 
-  // Security
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  // Team (mock)
-  const [teamMembers] = useState([
-    { id: 1, name: "Marc Lefebvre", email: "m.lefebvre@example.com", role: "Administrateur", avatar: "ML" },
-    { id: 2, name: "Sophie Martin", email: "s.martin@example.com", role: "Coach Principal", avatar: "SM" },
-  ]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [newMember, setNewMember] = useState({ name: "", email: "", role: "member" });
+
+  const loadTeamMembers = async () => {
+    if (!user?.club_id) return;
+    const { data } = await supabase
+      .from("club_members")
+      .select("*")
+      .eq("club_id", user.club_id);
+    if (data) {
+      setTeamMembers(data.map((m: any) => ({
+        id: m.id,
+        name: m.name || "Membre",
+        email: m.email || "",
+        role: m.role === "admin" ? "Administrateur" : m.role === "member" ? "Membre" : m.role,
+        avatar: (m.name || "M")?.split(" ").map((w: string) => w[0]).join("").toUpperCase(),
+      })));
+    }
+  };
 
   useEffect(() => {
     if (!user?.club_id) return;
@@ -63,6 +75,7 @@ export const Parametre = () => {
         setNotifReviews(settings.notification_reviews ?? true);
         setNotifMarketing(settings.notification_marketing ?? false);
       }
+      await loadTeamMembers();
       setLoading(false);
     };
     load();
@@ -115,6 +128,41 @@ export const Parametre = () => {
     navigate("/");
   };
 
+  const handleAddMember = async () => {
+    if (!user?.club_id || !newMember.name || !newMember.email) {
+      setMessage("Veuillez saisir le nom et l'email du membre.");
+      return;
+    }
+    const { data, error } = await supabase.from("club_members").insert({
+      club_id: user.club_id,
+      name: newMember.name,
+      email: newMember.email,
+      role: newMember.role,
+      user_id: crypto.randomUUID(),
+    }).select("*").single();
+    if (!error && data) {
+      setTeamMembers([...teamMembers, {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        role: data.role === "admin" ? "Administrateur" : "Membre",
+        avatar: data.name?.split(" ").map((w: string) => w[0]).join("").toUpperCase(),
+      }]);
+      setShowMemberModal(false);
+      setNewMember({ name: "", email: "", role: "member" });
+      setMessage("Membre ajouté !");
+      setTimeout(() => setMessage(""), 3000);
+    } else {
+      setMessage(error?.message || "Erreur lors de l'ajout du membre.");
+    }
+  };
+
+  const handleDeleteMember = async (id: string) => {
+    if (!confirm("Supprimer ce membre ?")) return;
+    await supabase.from("club_members").delete().eq("id", id);
+    setTeamMembers(teamMembers.filter((m) => m.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
       <ClubSidebar />
@@ -135,7 +183,6 @@ export const Parametre = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Sidebar nav */}
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl border border-gray-100 p-4">
                   <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4">Sections</p>
@@ -154,7 +201,6 @@ export const Parametre = () => {
                     ))}
                   </div>
                 </div>
-
                 <div className="bg-gradient-to-br from-[#00694c] to-[#004a35] rounded-2xl text-white p-6">
                   <p className="text-xs font-bold text-[#d4f5e9] tracking-widest uppercase mb-2">Statut du Club</p>
                   <h3 className="font-black text-xl mb-3">Vérifié Premium</h3>
@@ -165,13 +211,11 @@ export const Parametre = () => {
                 </div>
               </div>
 
-              {/* Content */}
               <div className="lg:col-span-3 space-y-6">
                 {activeSection === "profile" && (
                   <div className="bg-white rounded-2xl border border-gray-100 p-6">
                     <h2 className="font-bold text-gray-900 text-lg mb-1">Profil du Club</h2>
                     <p className="text-sm text-gray-500 mb-6">Ces informations seront visibles par les membres et clients.</p>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       <div>
                         <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">Nom du Club</label>
@@ -202,7 +246,6 @@ export const Parametre = () => {
                         </div>
                       </div>
                     </div>
-
                     <div className="flex items-center justify-end gap-4">
                       <button className="px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
                       <button onClick={handleSaveProfile} disabled={saving || loading} className="px-6 py-2.5 rounded-xl bg-[#00694c] text-white text-sm font-semibold hover:bg-[#005a40] transition-colors disabled:opacity-50 flex items-center gap-2">
@@ -220,8 +263,8 @@ export const Parametre = () => {
                         <h2 className="font-bold text-gray-900 text-lg mb-1">Gestion d'Équipe</h2>
                         <p className="text-sm text-gray-500">Invitez et gérez les rôles de vos collaborateurs.</p>
                       </div>
-                      <button className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
-                        <Users size={16} />
+                      <button onClick={() => setShowMemberModal(true)} className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <Plus size={16} />
                         Ajouter un membre
                       </button>
                     </div>
@@ -237,7 +280,12 @@ export const Parametre = () => {
                               <p className="text-xs text-gray-500">{m.email}</p>
                             </div>
                           </div>
-                          <span className={`text-xs font-bold px-3 py-1 rounded-full ${m.role === "Administrateur" ? "bg-[#d4f5e9] text-[#00694c]" : "bg-gray-100 text-gray-600"}`}>{m.role}</span>
+                          <div className="flex items-center gap-3">
+                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${m.role === "Administrateur" ? "bg-[#d4f5e9] text-[#00694c]" : "bg-gray-100 text-gray-600"}`}>{m.role}</span>
+                            <button onClick={() => handleDeleteMember(m.id)} className="p-1.5 hover:bg-red-100 rounded-lg text-gray-400 hover:text-red-600 transition-colors">
+                              <X size={14} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -293,7 +341,6 @@ export const Parametre = () => {
                       Changer le mot de passe
                     </button>
                     <p className="text-xs text-gray-400 text-center mt-3">Dernière modification : il y a 3 mois</p>
-
                     <div className="mt-8 border border-red-200 rounded-xl p-6 bg-red-50 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
@@ -316,6 +363,39 @@ export const Parametre = () => {
           <Footer />
         </div>
       </div>
+
+      {showMemberModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-lg text-gray-900">Ajouter un membre</h3>
+              <button onClick={() => setShowMemberModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">Nom</label>
+                <input value={newMember.name} onChange={(e) => setNewMember({ ...newMember, name: e.target.value })} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#00694c]" placeholder="Marc Lefebvre" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">Email</label>
+                <input value={newMember.email} onChange={(e) => setNewMember({ ...newMember, email: e.target.value })} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#00694c]" placeholder="email@example.com" type="email" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">Rôle</label>
+                <select value={newMember.role} onChange={(e) => setNewMember({ ...newMember, role: e.target.value })} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-white outline-none focus:border-[#00694c]">
+                  <option value="member">Membre</option>
+                  <option value="admin">Administrateur</option>
+                </select>
+              </div>
+            </div>
+            <button onClick={handleAddMember} className="w-full bg-[#00694c] text-white font-semibold py-3 rounded-xl hover:bg-[#005a40] transition-colors">
+              Ajouter le membre
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

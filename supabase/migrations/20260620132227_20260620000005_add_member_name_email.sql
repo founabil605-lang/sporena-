@@ -1,0 +1,3 @@
+ALTER TABLE club_members
+ADD COLUMN IF NOT EXISTS name text,
+ADD COLUMN IF NOT EXISTS email text;
