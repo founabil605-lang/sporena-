@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CalendarDays, MapPin, X, Shield } from "lucide-react";
 import { FanSidebar } from "../../components/FanSidebar";
+import { FanTopbar } from "../../components/FanTopbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../contexts/AuthContext";
 import { supabase } from "../../lib/supabase";
@@ -86,6 +87,7 @@ export const FanCancel = () => {
     <div className="min-h-screen bg-[#faf9f5] flex">
       <FanSidebar />
       <div className="flex-1 flex flex-col">
+        <FanTopbar />
         <div className="flex-1 overflow-y-auto">
           <div className="p-8 max-w-5xl mx-auto">
             <p className="text-[10px] font-bold text-[#d14405] tracking-widest uppercase mb-2">Annulation de réservation</p>

@@ -16,6 +16,9 @@ import { FanReviews } from "./screens/FanReviews";
 import { FanFavorites } from "./screens/FanFavorites";
 import { FanSettings } from "./screens/FanSettings";
 import { FanCancel } from "./screens/FanCancel";
+import { FanProfile } from "./screens/FanProfile";
+import { FanCart } from "./screens/FanCart";
+import { FanNotifications } from "./screens/FanNotifications";
 import { ClubDashboard } from "./screens/ClubDashboard";
 import { ClubExperiences } from "./screens/ClubExperiences";
 import { ClubBookings } from "./screens/ClubBookings";
@@ -137,6 +140,30 @@ export const App = () => {
             element={
               <ProtectedRoute requiredRole="fan">
                 <FanCancel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/profile"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/cart"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanCart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/fan/notifications"
+            element={
+              <ProtectedRoute requiredRole="fan">
+                <FanNotifications />
               </ProtectedRoute>
             }
           />

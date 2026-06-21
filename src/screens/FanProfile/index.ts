@@ -1,0 +1,1 @@
+export { FanProfile } from "./FanProfile";

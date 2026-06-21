@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Save, TriangleAlert as AlertTriangle, Mail, Bell, MessageSquare, Download } from "lucide-react";
 import { FanSidebar } from "../../components/FanSidebar";
+import { FanTopbar } from "../../components/FanTopbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../contexts/AuthContext";
 import { supabase } from "../../lib/supabase";
@@ -80,6 +81,7 @@ export const FanSettings = () => {
     <div className="min-h-screen bg-[#faf9f5] flex">
       <FanSidebar />
       <div className="flex-1 flex flex-col">
+        <FanTopbar />
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">
             <div className="mb-8">
