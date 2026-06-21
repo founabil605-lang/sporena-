@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CalendarDays, MessageSquare, Heart, Settings, LogOut, User } from "lucide-react";
+import { CalendarDays, Search, MessageSquare, Heart, Settings, LogOut, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export const FanSidebar = () => {
@@ -9,6 +9,7 @@ export const FanSidebar = () => {
 
   const menuItems = [
     { label: "Mes réservations", icon: CalendarDays, path: "/fan/dashboard" },
+    { label: "Explorer", icon: Search, path: "/search" },
     { label: "Mes avis", icon: MessageSquare, path: "/fan/reviews" },
     { label: "Mes favoris", icon: Heart, path: "/fan/favorites" },
     { label: "Paramètres", icon: Settings, path: "/fan/settings" },
