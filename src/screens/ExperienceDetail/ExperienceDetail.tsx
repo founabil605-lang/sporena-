@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { MapPin, Calendar, ChevronDown, Star, CircleCheck as CheckCircle, Users, Shield, ChevronRight } from "lucide-react";
+import { MapPin, Calendar, ChevronDown, Star, CircleCheck as CheckCircle, Users, Shield, ChevronRight, Lock } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
+import { useAuth } from "../../contexts/AuthContext";
 import { supabase } from "../../lib/supabase";
 
 const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800";
@@ -10,12 +11,14 @@ const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-188
 export const ExperienceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [exp, setExp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -61,6 +64,10 @@ export const ExperienceDetail = () => {
 
   const handleBook = () => {
     if (!exp) return;
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
     navigate(`/checkout/${exp.id}`);
   };
 
@@ -303,6 +310,38 @@ export const ExperienceDetail = () => {
           </div>
         </div>
       </div>
+
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f0faf6] flex items-center justify-center mx-auto mb-4">
+              <Lock size={28} className="text-[#00694c]" />
+            </div>
+            <h2 className="font-bold text-xl text-gray-900 mb-2">Connexion requise</h2>
+            <p className="text-gray-500 text-sm mb-6">Connectez-vous ou créez un compte pour réserver cette expérience.</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => navigate("/fan/login")}
+                className="w-full bg-[#00694c] text-white font-bold py-3 rounded-xl hover:bg-[#005a40] transition-colors"
+              >
+                Se connecter
+              </button>
+              <button
+                onClick={() => navigate("/auth/fan-register")}
+                className="w-full border border-[#00694c] text-[#00694c] font-bold py-3 rounded-xl hover:bg-[#f0faf6] transition-colors"
+              >
+                Créer un compte
+              </button>
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="text-gray-500 text-sm hover:text-gray-700"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { CreditCard, Clock, MapPin, Shield, Bell } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
-import { experiences } from "../../data/experiences";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../lib/supabase";
+
+const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800";
 
 export const Checkout = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const exp = experiences.find((e) => e.id === id) || experiences[5];
+  const { user } = useAuth();
+  const [exp, setExp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -16,8 +22,35 @@ export const Checkout = () => {
   const [address, setAddress] = useState("");
   const [agreed, setAgreed] = useState(false);
 
-  const priceHT = Math.round(exp.price / 1.2 * 100) / 100;
-  const tva = Math.round((exp.price - priceHT) * 100) / 100;
+  useEffect(() => {
+    if (!user) {
+      navigate("/fan/login");
+      return;
+    }
+    const fetch = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from("club_experiences")
+        .select("*, clubs(name, logo_url)")
+        .eq("id", id)
+        .single();
+      if (data) {
+        setExp({
+          id: data.id,
+          title: data.title,
+          club: data.clubs?.name || "Club",
+          price: data.price || 0,
+          date: data.date || "Date à définir",
+          time: data.time || "Heure à définir",
+          location: data.location || "Paris",
+          address: data.address || "",
+          image: data.images?.[0] || data.image_url || DEFAULT_IMAGE,
+        });
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, [id, user, navigate]);
 
   const formatCard = (val: string) => {
     return val.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim().slice(0, 19);
@@ -27,11 +60,54 @@ export const Checkout = () => {
     return val.replace(/\D/g, "").replace(/^(\d{2})(\d)/, "$1 / $2").slice(0, 7);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed) return;
-    navigate(`/confirmation/${exp.id}`);
+    if (!agreed || !exp || !user) return;
+    setSubmitting(true);
+
+    const { data: booking, error } = await supabase
+      .from("bookings")
+      .insert({
+        user_id: user.id,
+        customer_email: user.email,
+        experience_id: exp.id,
+        experience_name: exp.title,
+        date_time: new Date(`${exp.date}T${exp.time}:00`).toISOString(),
+        price: exp.price,
+        status: "confirmed",
+        payment_status: "paid",
+        club_name: exp.club,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Booking error:", error);
+      setSubmitting(false);
+      return;
+    }
+
+    navigate(`/confirmation/${booking.id}`);
   };
+
+  const priceHT = exp ? Math.round(exp.price / 1.2 * 100) / 100 : 0;
+  const tva = exp ? Math.round((exp.price - priceHT) * 100) / 100 : 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#faf9f5] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!exp) {
+    return (
+      <div className="min-h-screen bg-[#faf9f5] flex items-center justify-center">
+        <p className="text-gray-500">Expérience non trouvée</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
@@ -45,8 +121,7 @@ export const Checkout = () => {
             <Link to="#" className="text-sm font-medium text-gray-700 hover:text-[#00694c]">Aide</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link to="/login" className="text-sm font-medium text-gray-700 hover:text-[#00694c]">Connexion</Link>
-            <Link to="/register" className="bg-[#00694c] text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#005a40] transition-colors">S'inscrire</Link>
+            <Link to="/fan/dashboard" className="text-sm font-medium text-gray-700 hover:text-[#00694c]">Mon espace</Link>
           </div>
         </div>
       </header>
@@ -74,20 +149,23 @@ export const Checkout = () => {
                   <div className="w-8 h-8 rounded-full bg-[#00694c] text-white flex items-center justify-center font-bold text-sm">1</div>
                   <h2 className="font-bold text-gray-900">Confirmation du créneau</h2>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="font-semibold text-[#00694c] text-sm mb-3">{exp.title}</p>
-                  <div className="flex flex-col gap-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <span>📅</span>
-                      <span>{exp.date}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock size={14} className="text-gray-400" />
-                      <span>{exp.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin size={14} className="text-gray-400" />
-                      <span>{exp.location}</span>
+                <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
+                  <img src={exp.image} alt="" className="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#00694c] text-sm mb-1">{exp.title}</p>
+                    <div className="flex flex-col gap-1 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <span>📅</span>
+                        <span>{exp.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={14} className="text-gray-400" />
+                        <span>{exp.time}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-gray-400" />
+                        <span>{exp.location}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -203,11 +281,11 @@ export const Checkout = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={!agreed}
+                  disabled={!agreed || submitting}
                   className="w-full bg-[#00694c] hover:bg-[#005a40] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   <Shield size={16} />
-                  Payer {exp.price.toFixed(2)} €
+                  {submitting ? "Traitement..." : `Payer ${exp.price.toFixed(2)} €`}
                 </button>
                 <div className="flex items-center gap-2 mt-3 justify-center">
                   <Shield size={13} className="text-gray-400" />

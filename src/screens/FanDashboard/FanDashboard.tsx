@@ -24,7 +24,7 @@ export const FanDashboard = () => {
 
     const [profileRes, bookingsRes, recsRes] = await Promise.all([
       supabase.from("fan_profiles").select("*").eq("user_id", user.id).single(),
-      supabase.from("bookings").select("*, club_experiences(*, clubs(name))").eq("customer_email", user.email).order("date_time", { ascending: false }),
+      supabase.from("bookings").select("*, club_experiences(*, clubs(name))").or(`user_id.eq.${user.id},customer_email.eq.${user.email}`).order("date_time", { ascending: false }),
       supabase.from("club_experiences").select("*, clubs(name)").eq("status", "public").order("created_at", { ascending: false }).limit(4),
     ]);
 

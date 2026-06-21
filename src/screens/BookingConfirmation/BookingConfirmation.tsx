@@ -1,7 +1,9 @@
-import { useParams, Link } from "react-router-dom";
-import { Calendar, MapPin, User, Download, CalendarPlus, Mail, CircleCheck as CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Calendar, MapPin, User, Download, CalendarPlus, Mail, CircleCheck as CheckCircle, Share2, Chrome as Home, ArrowRight } from "lucide-react";
 import { Footer } from "../../components/Footer";
-import { experiences } from "../../data/experiences";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const QRCode = () => (
   <div className="grid grid-cols-8 gap-0.5 w-24 h-24">
@@ -28,9 +30,125 @@ const QRCode = () => (
 
 export const BookingConfirmation = () => {
   const { id } = useParams();
-  const exp = experiences.find((e) => e.id === id) || experiences[0];
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [booking, setBooking] = useState<any>(null);
+  const [exp, setExp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const reference = `#SP-${Math.floor(100000 + Math.random() * 900000).toString().slice(0, 6)}`;
+  useEffect(() => {
+    const fetch = async () => {
+      if (!id) return;
+      const { data: bookingData } = await supabase
+        .from("bookings")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (bookingData) {
+        setBooking(bookingData);
+        const { data: expData } = await supabase
+          .from("club_experiences")
+          .select("*, clubs(name, logo_url)")
+          .eq("id", bookingData.experience_id)
+          .single();
+        if (expData) {
+          setExp({
+            id: expData.id,
+            title: expData.title,
+            club: expData.clubs?.name || "Club",
+            category: expData.category,
+            price: expData.price || 0,
+            date: expData.date || "Date à définir",
+            time: expData.time || "Heure à définir",
+            location: expData.location || "Paris",
+            address: expData.address || "",
+            images: expData.images || [expData.image_url || "https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=800"],
+            description: expData.description || "",
+            certified: expData.certified || false,
+          });
+        }
+      }
+      setLoading(false);
+    };
+    fetch();
+  }, [id]);
+
+  const handleDownloadTicket = () => {
+    if (!booking || !exp) return;
+    const content = `
+╔══════════════════════════════════════════════════════╗
+║                SPORENA - TICKET VIP                 ║
+╠══════════════════════════════════════════════════════╣
+║  Référence: ${booking.id?.slice(0, 8).toUpperCase() || "N/A"}                          ║
+║  Expérience: ${exp.title}                            ║
+║  Club: ${exp.club}                                   ║
+║  Date: ${exp.date}                                   ║
+║  Heure: ${exp.time}                                  ║
+║  Lieu: ${exp.location}                               ║
+║  Adresse: ${exp.address || "-"}                      ║
+║  Participant: ${user?.email || booking.customer_email}                           ║
+║  Prix: ${exp.price}€                                 ║
+║  Statut: CONFIRMÉ                                   ║
+╚══════════════════════════════════════════════════════╝
+    `;
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `billet-sporena-${booking.id?.slice(0, 8)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleAddToCalendar = () => {
+    if (!exp) return;
+    const title = encodeURIComponent(exp.title);
+    const location = encodeURIComponent(`${exp.location}, ${exp.address}`);
+    const description = encodeURIComponent(`Réservation SPORENA - ${exp.title} avec ${exp.club}`);
+    const dateStr = exp.date;
+    const timeStr = exp.time.split(" - ")[0] || exp.time;
+    const startDate = new Date(`${dateStr}T${timeStr}:00`);
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+    const format = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${format(startDate)}/${format(endDate)}&details=${description}&location=${location}`;
+    window.open(url, "_blank");
+  };
+
+  const handleResendEmail = async () => {
+    if (!booking || !exp) return;
+    await supabase.from("fan_notifications").insert({
+      user_id: user?.id,
+      title: "Confirmation de réservation",
+      message: `Votre réservation pour "${exp.title}" a été confirmée. Référence: ${booking.id?.slice(0, 8).toUpperCase()}`,
+      type: "general",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#faf9f5] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#00694c] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!booking || !exp) {
+    return (
+      <div className="min-h-screen bg-[#faf9f5] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Réservation non trouvée</p>
+          <button onClick={() => navigate("/search")} className="px-6 py-3 rounded-xl bg-[#00694c] text-white font-semibold">
+            Explorer les expériences
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const reference = booking.id ? `#SP-${booking.id.slice(0, 6).toUpperCase()}` : "#SP-000000";
+  const participantName = user?.user_metadata?.pseudo || user?.email?.split("@")[0] || "Jean-Marc Dupont";
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
@@ -61,20 +179,45 @@ export const BookingConfirmation = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <button className="flex-1 bg-[#00694c] hover:bg-[#005a40] text-white font-bold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition-colors">
+              <button
+                onClick={handleDownloadTicket}
+                className="flex-1 bg-[#00694c] hover:bg-[#005a40] text-white font-bold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+              >
                 <Download size={16} />
-                Télécharger mon billet PDF
+                Télécharger mon billet
               </button>
-              <button className="flex-1 bg-[#eef2ff] hover:bg-[#e0e8ff] text-[#071b39] font-bold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition-colors">
+              <button
+                onClick={handleAddToCalendar}
+                className="flex-1 bg-[#eef2ff] hover:bg-[#e0e8ff] text-[#071b39] font-bold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 transition-colors"
+              >
                 <CalendarPlus size={16} />
                 Ajouter au calendrier
               </button>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Mail size={15} />
-              <span>Vous n'avez pas reçu l'email ?{" "}</span>
-              <button className="text-[#00694c] font-semibold hover:underline">Renvoyer la confirmation</button>
+            <div className="flex flex-col gap-2 w-full">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Mail size={15} />
+                <span>Vous n'avez pas reçu l'email ?{" "}</span>
+                <button onClick={handleResendEmail} className="text-[#00694c] font-semibold hover:underline">Renvoyer la confirmation</button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
+              <button
+                onClick={() => navigate("/fan/dashboard")}
+                className="flex-1 border border-gray-200 text-gray-700 font-bold py-3 px-5 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+              >
+                <Home size={16} />
+                Mon espace
+              </button>
+              <button
+                onClick={() => navigate("/search")}
+                className="flex-1 border border-gray-200 text-gray-700 font-bold py-3 px-5 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+              >
+                <ArrowRight size={16} />
+                Continuer
+              </button>
             </div>
           </div>
 
@@ -100,7 +243,7 @@ export const BookingConfirmation = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 font-medium">Date & Heure</p>
-                    <p className="text-sm font-semibold text-gray-900">{exp.date} • {exp.time.split(" - ")[1] || exp.time.split("–")[1] || exp.time}</p>
+                    <p className="text-sm font-semibold text-gray-900">{exp.date} • {exp.time}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -118,7 +261,7 @@ export const BookingConfirmation = () => {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 font-medium">Participant</p>
-                    <p className="text-sm font-semibold text-gray-900">Jean-Marc Dupont</p>
+                    <p className="text-sm font-semibold text-gray-900">{participantName}</p>
                   </div>
                 </div>
               </div>
