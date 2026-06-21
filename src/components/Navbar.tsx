@@ -70,12 +70,12 @@ export const Navbar = () => {
                     </Link>
                   )}
                   <Link
-                    to="#"
+                    to="/fan/dashboard"
                     onClick={() => setUserMenuOpen(false)}
                     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    <User size={16} />
-                    Mon profil
+                    <LayoutDashboard size={16} />
+                    Mon espace
                   </Link>
                   <hr className="my-2 border-gray-100" />
                   <button

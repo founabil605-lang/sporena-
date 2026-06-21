@@ -20,7 +20,6 @@ export const Checkout = () => {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [address, setAddress] = useState("");
-  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -62,7 +61,7 @@ export const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed || !exp || !user) return;
+    if (!exp || !user) return;
     setSubmitting(true);
 
     const { data: booking, error } = await supabase
@@ -240,11 +239,8 @@ export const Checkout = () => {
                 </div>
 
                 <div className="flex items-start gap-3 mt-5">
-                  <div
-                    onClick={() => setAgreed(!agreed)}
-                    className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 cursor-pointer flex items-center justify-center transition-colors ${agreed ? "bg-[#00694c] border-[#00694c]" : "border-gray-300"}`}
-                  >
-                    {agreed && <span className="text-white text-xs">✓</span>}
+                  <div className="w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 bg-[#00694c] border-[#00694c] flex items-center justify-center">
+                    <span className="text-white text-xs">✓</span>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     J'accepte les{" "}
@@ -281,8 +277,8 @@ export const Checkout = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={!agreed || submitting}
-                  className="w-full bg-[#00694c] hover:bg-[#005a40] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+                  disabled={submitting}
+                  className="w-full bg-[#00694c] hover:bg-[#005a40] text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   <Shield size={16} />
                   {submitting ? "Traitement..." : `Payer ${exp.price.toFixed(2)} €`}

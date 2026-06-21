@@ -13,12 +13,12 @@ const DEFAULT_IMAGE = "https://images.pexels.com/photos/1884574/pexels-photo-188
 
 export const SearchResults = () => {
   const [searchParams] = useSearchParams();
-  const query = searchParams.get("q") || "Football";
+  const query = searchParams.get("q") || "";
 
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(500);
   const [date, setDate] = useState("");
-  const [selectedSports, setSelectedSports] = useState<string[]>(query !== "" ? [query] : []);
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [available, setAvailable] = useState(false);
   const [distance, setDistance] = useState("Moins de 5 km");
   const [sort, setSort] = useState("Pertinence");
