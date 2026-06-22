@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { CreditCard, Clock, MapPin, Shield, Bell } from "lucide-react";
+import { Clock, MapPin, Shield, Bell, CircleCheck as CheckCircle } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import { useAuth } from "../../contexts/AuthContext";
@@ -16,10 +16,7 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [address, setAddress] = useState("");
+  const [cardNumber] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -51,13 +48,7 @@ export const Checkout = () => {
     fetch();
   }, [id, user, navigate]);
 
-  const formatCard = (val: string) => {
-    return val.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim().slice(0, 19);
-  };
-
-  const formatExpiry = (val: string) => {
-    return val.replace(/\D/g, "").replace(/^(\d{2})(\d)/, "$1 / $2").slice(0, 7);
-  };
+  // Payment flow is bypassed for testing — no Stripe configured yet
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,69 +164,15 @@ export const Checkout = () => {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-8 h-8 rounded-full bg-[#00694c] text-white flex items-center justify-center font-bold text-sm">2</div>
-                  <h2 className="font-bold text-gray-900">Paiement Sécurisé</h2>
+                  <h2 className="font-bold text-gray-900">Confirmation de la réservation</h2>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <button type="button" className="border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-700 hover:border-[#00694c] hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    Apple Pay
-                  </button>
-                  <button type="button" className="border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-700 hover:border-[#00694c] hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    Google Pay
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="flex-1 h-px bg-gray-100" />
-                  <span className="text-xs font-bold text-gray-400 tracking-widest uppercase">Ou par carte bancaire</span>
-                  <div className="flex-1 h-px bg-gray-100" />
-                </div>
-
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 tracking-wider uppercase block mb-1.5">Numéro de carte</label>
-                    <div className="flex items-center border border-gray-200 rounded-xl px-4 py-3 focus-within:border-[#00694c] transition-colors">
-                      <input
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(formatCard(e.target.value))}
-                        className="bg-transparent text-sm outline-none flex-1 text-gray-800 placeholder-gray-300"
-                        placeholder="0000 0000 0000 0000"
-                        inputMode="numeric"
-                      />
-                      <CreditCard size={16} className="text-gray-300" />
-                    </div>
+                <div className="bg-gray-50 rounded-xl p-5 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#d4f5e9] flex items-center justify-center mx-auto mb-3">
+                    <CheckCircle size={24} className="text-[#00694c]" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 tracking-wider uppercase block mb-1.5">Expiration</label>
-                      <input
-                        value={expiry}
-                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#00694c] transition-colors placeholder-gray-300"
-                        placeholder="MM / AA"
-                        inputMode="numeric"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-gray-600 tracking-wider uppercase block mb-1.5">CVC</label>
-                      <input
-                        value={cvc}
-                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 3))}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#00694c] transition-colors placeholder-gray-300"
-                        placeholder="123"
-                        inputMode="numeric"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-600 tracking-wider uppercase block mb-1.5">Adresse de facturation</label>
-                    <input
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#00694c] transition-colors placeholder-gray-300"
-                      placeholder="Rue, Ville, Code Postal"
-                    />
-                  </div>
+                  <p className="text-sm text-gray-600 mb-1">Votre réservation est prête à être confirmée.</p>
+                  <p className="text-sm text-gray-400">Cliquez sur le bouton ci-dessous pour finaliser.</p>
                 </div>
 
                 <div className="flex items-start gap-3 mt-5">
