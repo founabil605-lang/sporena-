@@ -15,6 +15,7 @@ export const FanCart = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -68,11 +69,11 @@ export const FanCart = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8 max-w-4xl mx-auto">
+          <div className="px-4 sm:px-8 py-8 max-w-4xl mx-auto">
             <div className="mb-8">
               <h1 className="text-4xl font-black text-gray-900 mb-2">Mon panier</h1>
               <p className="text-gray-600">Retrouvez ici les expériences que vous avez ajoutées à votre panier.</p>
@@ -96,7 +97,7 @@ export const FanCart = () => {
             ) : (
               <div className="space-y-6">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
+                  <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4 flex-wrap">
                     <img src={item.image} alt="" className="w-24 h-24 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-gray-900 text-base mb-1">{item.title}</h3>

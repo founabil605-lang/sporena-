@@ -102,7 +102,7 @@ export const Checkout = () => {
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 flex-wrap">
           <Link to="/">
             <span className="font-black text-[#00694c] text-xl tracking-tight">SPORENA</span>
           </Link>
@@ -116,10 +116,10 @@ export const Checkout = () => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8 w-full">
         <div className="mb-6">
           <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase mb-1">Étape 2 sur 3</p>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <h1 className="text-2xl font-black text-gray-900">Finaliser la réservation</h1>
             <div className="flex items-center gap-2 text-gray-400 text-sm">
               <Shield size={16} />
@@ -189,7 +189,7 @@ export const Checkout = () => {
             </div>
 
             <div className="lg:col-span-2 flex flex-col gap-4">
-              <div className="bg-[#eef2ff] rounded-2xl p-6 sticky top-24">
+              <div className="bg-[#eef2ff] rounded-2xl p-6 lg:sticky lg:top-24">
                 <h3 className="font-bold text-gray-900 mb-4">Récapitulatif de la commande</h3>
                 <div className="flex flex-col gap-3 text-sm mb-4">
                   <div className="flex justify-between">

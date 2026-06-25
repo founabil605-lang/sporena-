@@ -19,6 +19,7 @@ export const ClubBookings = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [showBookingModal, setShowBookingModal] = useState<string | null>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.club_id) return;
@@ -111,18 +112,18 @@ export const ClubBookings = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase">Gestion des flux</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Reservations</h1>
               <p className="text-gray-600">Gerez vos participants, suivez vos revenus et assurez le bon deroulement de chaque session sportive.</p>
             </div>
 
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-8 flex-wrap">
               <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
                 <Download size={16} />
                 Exporter CSV
@@ -197,7 +198,8 @@ export const ClubBookings = () => {
             ) : viewMode === "list" ? (
               <>
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                  <table className="w-full">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50">
                         <th className="text-left py-4 px-6 font-semibold text-gray-600 text-xs uppercase tracking-wider">Fan Name</th>
@@ -254,6 +256,7 @@ export const ClubBookings = () => {
                       )}
                     </tbody>
                   </table>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">Affichage de {filteredBookings.length} sur {bookings.length} reservations</p>
               </>
@@ -271,7 +274,8 @@ export const ClubBookings = () => {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-7 gap-1">
+                <div className="overflow-x-auto">
+                  <div className="grid grid-cols-7 gap-1 min-w-[300px]">
                   {weekdays.map((d) => (
                     <div key={d} className="text-center text-xs font-bold text-gray-400 py-2">{d}</div>
                   ))}
@@ -300,6 +304,7 @@ export const ClubBookings = () => {
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               </div>
             )}

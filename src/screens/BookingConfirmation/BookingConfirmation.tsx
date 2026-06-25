@@ -153,9 +153,13 @@ export const BookingConfirmation = () => {
   return (
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/">
             <span className="font-black text-[#00694c] text-xl tracking-tight">SPORENA</span>
+          </Link>
+          <Link to="/" className="md:hidden flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-[#00694c] transition-colors">
+            <Home size={16} />
+            Accueil
           </Link>
         </div>
       </header>

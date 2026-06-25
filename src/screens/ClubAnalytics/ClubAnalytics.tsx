@@ -18,6 +18,7 @@ export const ClubAnalytics = () => {
   const [revenueData, setRevenueData] = useState<number[]>([]);
   const [topExperience, setTopExperience] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   useEffect(() => {
     if (!user?.club_id) return;
@@ -129,15 +130,15 @@ export const ClubAnalytics = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-gray-500 tracking-widest uppercase">Performance Overview</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Analytics Dashboard</h1>
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-6 flex-wrap">
                 {["Monthly", "Quarterly", "Yearly"].map((range) => (
                   <button
                     key={range}
@@ -247,7 +248,7 @@ export const ClubAnalytics = () => {
                 </div>
 
                 <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="bg-white rounded-2xl border border-gray-100 p-8 flex gap-6">
+                  <div className="bg-white rounded-2xl border border-gray-100 p-8 flex gap-6 flex-wrap">
                     <div className="w-40 h-40 rounded-2xl bg-gradient-to-br from-orange-400 to-blue-600 flex items-center justify-center text-white text-6xl flex-shrink-0">
                       ⚽
                     </div>
@@ -264,7 +265,7 @@ export const ClubAnalytics = () => {
                   <div className="bg-white rounded-2xl border border-gray-100 p-6">
                     <h3 className="font-bold text-gray-900 mb-6">Fan Demographics</h3>
                     <p className="text-sm text-gray-600 mb-6">Audience breakdown by age and location engagement.</p>
-                    <div className="flex items-center gap-12">
+                    <div className="flex items-center gap-12 flex-wrap">
                       <div className="space-y-4">
                         {demographics.map((d, i) => (
                           <div key={i} className="text-center">

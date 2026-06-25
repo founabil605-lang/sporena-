@@ -21,6 +21,7 @@ export const Parametre = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const [clubName, setClubName] = useState("");
   const [website, setWebsite] = useState("");
@@ -165,11 +166,11 @@ export const Parametre = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase">Paramètres</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Paramètres</h1>
@@ -246,7 +247,7 @@ export const Parametre = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-end gap-4">
+                    <div className="flex items-center justify-end gap-4 flex-wrap">
                       <button className="px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
                       <button onClick={handleSaveProfile} disabled={saving || loading} className="px-6 py-2.5 rounded-xl bg-[#00694c] text-white text-sm font-semibold hover:bg-[#005a40] transition-colors disabled:opacity-50 flex items-center gap-2">
                         <Save size={16} />
@@ -341,7 +342,7 @@ export const Parametre = () => {
                       Changer le mot de passe
                     </button>
                     <p className="text-xs text-gray-400 text-center mt-3">Dernière modification : il y a 3 mois</p>
-                    <div className="mt-8 border border-red-200 rounded-xl p-6 bg-red-50 flex items-center justify-between">
+                    <div className="mt-8 border border-red-200 rounded-xl p-6 bg-red-50 flex items-center justify-between flex-wrap">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                           <AlertTriangle size={18} className="text-red-600" />

@@ -16,6 +16,7 @@ export const FanCancel = () => {
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refund, setRefund] = useState({ percent: 100, amount: 0, serviceFee: 0 });
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -85,11 +86,11 @@ export const FanCancel = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8 max-w-5xl mx-auto">
+          <div className="px-4 sm:px-8 py-8 max-w-5xl mx-auto">
             <p className="text-[10px] font-bold text-[#d14405] tracking-widest uppercase mb-2">Annulation de réservation</p>
             <h1 className="text-4xl font-black text-gray-900 mb-4">Voulez-vous vraiment annuler ?</h1>
             <p className="text-gray-600 mb-8 max-w-md">
@@ -106,7 +107,7 @@ export const FanCancel = () => {
                     </div>
                     <h3 className="font-bold text-gray-900">Politique d'annulation</h3>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
                     {timeline.map((t, i) => (
                       <div key={i} className="text-center">
                         <div className={`w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center ${t.active ? "bg-[#00694c]" : "bg-gray-100"}`}>

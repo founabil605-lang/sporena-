@@ -18,6 +18,7 @@ export const FanReviews = () => {
   const [showReviewModal, setShowReviewModal] = useState<string | null>(null);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
   const [editingReview, setEditingReview] = useState<string | null>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -92,11 +93,11 @@ export const FanReviews = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <h1 className="text-4xl font-black text-gray-900 mb-2">Mes avis</h1>
               <p className="text-gray-600">Partagez votre expérience et aidez la communauté.</p>
@@ -114,7 +115,7 @@ export const FanReviews = () => {
             {/* My reviews */}
             <div className="space-y-6 mb-8">
               {reviews.map((review) => (
-                <div key={review.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4">
+                <div key={review.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 flex-wrap">
                   <img src={review.image} alt="" className="w-32 h-32 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
@@ -129,7 +130,7 @@ export const FanReviews = () => {
                       <span className="flex items-center gap-1 text-xs">
                         <CalendarFallback size={12} /> Publié le {review.date}
                       </span>
-                      <div className="ml-auto flex items-center gap-3">
+                      <div className="ml-auto flex items-center gap-3 flex-wrap">
                         <button onClick={() => { setEditingReview(review.id); setReviewForm({ rating: review.rating, comment: review.comment }); }} className="text-[#00694c] text-xs font-semibold hover:underline">Modifier</button>
                         <button onClick={() => handleDeleteReview(review.id)} className="text-gray-500 text-xs font-semibold hover:underline">Supprimer</button>
                       </div>

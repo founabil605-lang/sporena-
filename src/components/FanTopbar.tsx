@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Bell, ShoppingCart, User } from "lucide-react";
+import { Bell, ShoppingCart, User, Menu } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 
-export const FanTopbar = () => {
+export const FanTopbar = ({ onMenuToggle }: { onMenuToggle?: () => void } = {}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -30,7 +30,11 @@ export const FanTopbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-end px-6 gap-4 sticky top-0 z-30">
+    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 gap-4 sticky top-0 z-30">
+      <button onClick={onMenuToggle} className="lg:hidden w-10 h-10 rounded-full hover:bg-gray-50 flex items-center justify-center text-gray-600 transition-colors">
+        <Menu size={20} />
+      </button>
+      <div className="flex items-center justify-end gap-4 flex-1">
       <button
         onClick={() => navigate("/fan/notifications")}
         className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-colors ${isActive("/fan/notifications") ? "bg-[#f0faf6] text-[#00694c]" : "hover:bg-gray-50 text-gray-600"}`}
@@ -67,6 +71,7 @@ export const FanTopbar = () => {
           </div>
         )}
       </button>
+      </div>
     </header>
   );
 };

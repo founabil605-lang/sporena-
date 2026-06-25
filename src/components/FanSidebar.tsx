@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CalendarDays, Search, MessageSquare, Heart, Settings, LogOut, User } from "lucide-react";
+import { CalendarDays, Search, MessageSquare, Heart, Settings, LogOut, User, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
-export const FanSidebar = () => {
+export const FanSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (v: boolean) => void }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -23,7 +23,20 @@ export const FanSidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0">
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 bg-black/30 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
+      )}
+      {/* Sidebar — mobile drawer + desktop sidebar */}
+      <aside className={`fixed lg:static top-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col h-screen transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Mobile close button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 lg:hidden w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600"
+        >
+          <X size={16} />
+        </button>
       <div className="p-6 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-lg bg-[#00694c] flex items-center justify-center text-white font-black">
@@ -68,5 +81,6 @@ export const FanSidebar = () => {
         </button>
       </div>
     </aside>
+    </>
   );
 };

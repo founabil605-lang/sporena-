@@ -71,7 +71,7 @@ export const HomePage = () => {
     <div className="min-h-screen bg-[#faf9f5] flex flex-col">
       <Navbar />
 
-      <section className="relative overflow-hidden" style={{ minHeight: 480 }}>
+      <section className="relative overflow-hidden min-h-[300px] sm:min-h-[480px]">
         <img
           src="https://images.pexels.com/photos/1884574/pexels-photo-1884574.jpeg?auto=compress&cs=tinysrgb&w=1600"
           alt="Stadium"
@@ -194,8 +194,7 @@ export const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
               onClick={() => navigate(`/experience/${trending[0]?.id}`)}
-              className="relative rounded-2xl overflow-hidden cursor-pointer group"
-              style={{ minHeight: 360 }}
+              className="relative rounded-2xl overflow-hidden cursor-pointer group min-h-[240px] sm:min-h-[360px]"
             >
               {trending[0] && (
                 <>
@@ -221,8 +220,7 @@ export const HomePage = () => {
                 <div
                   key={exp.id}
                   onClick={() => navigate(`/experience/${exp.id}`)}
-                  className="relative rounded-2xl overflow-hidden cursor-pointer group flex-1"
-                  style={{ minHeight: 168 }}
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group flex-1 min-h-[120px] sm:min-h-[168px]"
                 >
                   <img
                     src={exp.image}

@@ -17,6 +17,7 @@ export const FanDashboard = () => {
   const [historyBookings, setHistoryBookings] = useState<any[]>([]);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -67,14 +68,14 @@ export const FanDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">
             {/* Profile header */}
-            <div className="bg-[#2c3e50] rounded-2xl text-white p-6 mb-8 flex items-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="bg-[#2c3e50] rounded-2xl text-white p-6 mb-8 flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -93,7 +94,7 @@ export const FanDashboard = () => {
                   <div className="flex items-center gap-1 text-white/60 text-xs"><CalendarDays size={14} /><span>{upcomingBookings.length} à venir</span></div>
                 </div>
               </div>
-              <div className="bg-white/10 rounded-xl p-4 text-center flex-shrink-0">
+              <div className="bg-white/10 rounded-xl p-4 text-center flex-shrink-0 hidden sm:block">
                 <p className="text-xs text-white/60 uppercase tracking-widest mb-1">Score Sportif</p>
                 <p className="font-black text-3xl">{profile?.sport_score?.toLocaleString("fr-FR") || "2,480"} <span className="text-sm font-normal">pts</span></p>
               </div>
@@ -112,7 +113,7 @@ export const FanDashboard = () => {
               ) : (
                 <div className="space-y-4">
                   {upcomingBookings.map((b) => (
-                    <div key={b.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
+                    <div key={b.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4 flex-wrap sm:flex-nowrap">
                       <img src={b.club_experiences?.images?.[0] || DEFAULT_IMAGE} alt="" className="w-32 h-24 rounded-xl object-cover bg-gray-100 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -124,7 +125,7 @@ export const FanDashboard = () => {
                           <span className="flex items-center gap-1"><MapPin size={12} />{b.club_experiences?.location || "-"}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                         <span className="font-bold text-[#00694c] text-lg">{b.total_price}€</span>
                         <button className="flex items-center gap-1 px-3 py-2 rounded-lg bg-[#00694c] text-white text-xs font-semibold hover:bg-[#005a40] transition-colors">
                           <Ticket size={12} /> Voir le billet
@@ -169,7 +170,7 @@ export const FanDashboard = () => {
 
             {/* Pending reviews */}
             {historyBookings.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-100 border-dashed p-4 flex items-center gap-4 mb-8">
+              <div className="bg-white rounded-2xl border border-gray-100 border-dashed p-4 flex items-center gap-4 flex-wrap mb-8">
                 <div className="w-12 h-12 rounded-full bg-[#f0faf6] flex items-center justify-center text-[#00694c]">
                   <MessageSquareFallback />
                 </div>

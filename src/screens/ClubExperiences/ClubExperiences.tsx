@@ -15,6 +15,7 @@ export const ClubExperiences = () => {
   const [filter, setFilter] = useState("Toutes");
   const [actionMenu, setActionMenu] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadExperiences = async () => {
     if (!user?.club_id) return;
@@ -113,18 +114,18 @@ export const ClubExperiences = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase">Gestion des activites</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Mes experiences</h1>
               <p className="text-gray-600">Gerez votre catalogue d'activites sportives exclusives.</p>
             </div>
 
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-8 flex-wrap">
               <div className="flex gap-2">
                 {["Toutes", "Actives", "Archivees"].map((f) => (
                   <button
@@ -155,7 +156,8 @@ export const ClubExperiences = () => {
               </div>
             ) : (
               <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <table className="w-full">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50">
                       <th className="text-left py-4 px-6 font-semibold text-gray-600 text-xs uppercase tracking-wider">Experience</th>
@@ -243,7 +245,8 @@ export const ClubExperiences = () => {
                       </tr>
                     )}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             )}
 

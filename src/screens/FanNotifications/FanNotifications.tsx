@@ -13,6 +13,7 @@ export const FanNotifications = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -99,17 +100,17 @@ export const FanNotifications = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8 max-w-4xl mx-auto">
+          <div className="px-4 sm:px-8 py-8 max-w-4xl mx-auto">
             <div className="mb-8">
               <h1 className="text-4xl font-black text-gray-900 mb-2">Notifications</h1>
               <p className="text-gray-600">Restez informé de vos réservations et de vos expériences à venir.</p>
             </div>
 
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 flex-wrap mb-6">
               {[
                 { key: "all", label: "Toutes" },
                 { key: "unread", label: `Non lues (${unreadCount})` },

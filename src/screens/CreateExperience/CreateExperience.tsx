@@ -66,6 +66,7 @@ export const CreateExperience = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   // Step 1: Details
   const [title, setTitle] = useState("");
@@ -529,7 +530,7 @@ export const CreateExperience = () => {
               <p className="text-sm text-gray-500 mb-6">Définissez quand vous souhaitez accueillir vos participants.</p>
 
               <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">
                       Date
@@ -558,7 +559,7 @@ export const CreateExperience = () => {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="text-xs font-bold text-gray-500 tracking-widest uppercase block mb-2">
                       Début
@@ -925,11 +926,11 @@ export const CreateExperience = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
             {/* Header */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">

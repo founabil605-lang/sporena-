@@ -14,6 +14,7 @@ export const FanFavorites = () => {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -49,11 +50,11 @@ export const FanFavorites = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <h1 className="text-4xl font-black text-gray-900 mb-2">Mes favoris</h1>
               <p className="text-gray-600">Retrouvez ici toutes vos expériences sportives préférées. Des sessions VIP aux accès exclusifs, gardez vos coups de cœur à portée de main.</p>
@@ -67,7 +68,7 @@ export const FanFavorites = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {favorites.map((f) => (
                   <div key={f.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden group">
-                    <div className="relative overflow-hidden" style={{ aspectRatio: "4/3" }}>
+                    <div className="relative overflow-hidden aspect-[4/3]">
                       <img src={f.image} alt={f.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <button onClick={() => handleRemove(f.id)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-red-50 transition-colors">
                         <Heart size={16} className="fill-red-500 text-red-500" />

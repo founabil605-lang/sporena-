@@ -20,6 +20,7 @@ export const ClubDashboard = () => {
   const [topExperience, setTopExperience] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [experiencesCount, setExperiencesCount] = useState(0);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   useEffect(() => {
     if (!user?.club_id) return;
@@ -127,18 +128,18 @@ export const ClubDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <ClubSidebar />
+      <ClubSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <ClubTopbar />
+        <ClubTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <p className="text-xs font-bold text-[#00694c] tracking-widest uppercase">Vue d'ensemble</p>
               <h1 className="text-4xl font-black text-gray-900 mb-2">Tableau de Bord</h1>
               <p className="text-gray-600">Bienvenue, {clubName}. Voici l'etat de vos experiences et revenus pour ce mois.</p>
             </div>
 
-            <div className="flex gap-4 mb-8">
+            <div className="flex gap-4 mb-8 flex-wrap">
               <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
                 <span>📥</span>
                 Exporter

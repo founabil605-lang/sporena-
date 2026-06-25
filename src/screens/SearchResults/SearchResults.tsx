@@ -23,6 +23,7 @@ export const SearchResults = () => {
   const [distance, setDistance] = useState("Moins de 5 km");
   const [sort, setSort] = useState("Pertinence");
   const [sortOpen, setSortOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [experiencesList, setExperiencesList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -186,6 +187,13 @@ export const SearchResults = () => {
                 <Map size={15} />
                 Carte
               </button>
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className="lg:hidden flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#00694c] transition-colors bg-white"
+              >
+                <SlidersHorizontal size={15} />
+                Filtres
+              </button>
               <div className="relative">
                 <button
                   onClick={() => setSortOpen(!sortOpen)}
@@ -241,6 +249,56 @@ export const SearchResults = () => {
           )}
         </main>
       </div>
+
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileFiltersOpen(false)} />
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto p-6 shadow-xl animate-in slide-in-from-bottom">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-lg text-gray-900">Filtres</h2>
+              <button onClick={() => setMobileFiltersOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-5">
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sport</p>
+                <div className="flex flex-col gap-1">
+                  {sports.map((sport) => (
+                    <label key={sport} className="flex items-center gap-2 text-sm text-gray-700 py-1.5 cursor-pointer">
+                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#00694c] focus:ring-[#00694c]" checked={selectedSports.includes(sport)} onChange={() => toggleSport(sport)} />
+                      {sport}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Type</p>
+                <div className="flex flex-col gap-1">
+                  {types.map((type) => (
+                    <label key={type} className="flex items-center gap-2 text-sm text-gray-700 py-1.5 cursor-pointer">
+                      <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#00694c] focus:ring-[#00694c]" checked={selectedTypes.includes(type)} onChange={() => toggleType(type)} />
+                      {type}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Prix</p>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs text-gray-500">Min</label>
+                  <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="€" />
+                  <label className="text-xs text-gray-500">Max</label>
+                  <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="€" />
+                </div>
+              </div>
+              <button onClick={() => { setMinPrice(""); setMaxPrice(""); setSelectedSports([]); setSelectedTypes([]); }} className="text-sm text-[#00694c] font-semibold hover:underline mt-2">
+                Réinitialiser les filtres
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -20,6 +20,7 @@ export const FanSettings = () => {
   const [emailNotif, setEmailNotif] = useState(true);
   const [pushNotif, setPushNotif] = useState(true);
   const [smsNotif, setSmsNotif] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -79,11 +80,11 @@ export const FanSettings = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
+          <div className="px-4 sm:px-8 py-8">
             <div className="mb-8">
               <h1 className="text-4xl font-black text-gray-900 mb-2">Paramètres</h1>
               <p className="text-gray-600">Gérez vos informations personnelles et vos préférences de compte.</p>
@@ -104,7 +105,7 @@ export const FanSettings = () => {
                     <p className="text-sm text-gray-500">Ces informations seront visibles par les autres membres de la communauté.</p>
                   </div>
                   <div className="lg:col-span-2 space-y-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                       <div className="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center relative">
                         {avatarUrl ? (
                           <img src={avatarUrl} alt="" className="w-full h-full object-cover" />

@@ -115,7 +115,7 @@ export const ExperienceDetail = () => {
       <div className="relative">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1 max-h-[480px] overflow-hidden">
           <div className="relative overflow-hidden cursor-pointer" onClick={() => { setActiveImg(0); setGalleryOpen(true); }}>
-            <img src={exp.images[0] || DEFAULT_IMAGE} alt={exp.title} className="w-full h-full object-cover" style={{ maxHeight: 480 }} />
+            <img src={exp.images[0] || DEFAULT_IMAGE} alt={exp.title} className="w-full h-full object-cover max-h-[480px]" />
             <div className="absolute bottom-4 left-4 flex gap-2">
               {exp.tags.map((tag: string) => (
                 <span key={tag} className="bg-[#00694c] text-white text-xs font-bold px-3 py-1 rounded-full">{tag}</span>
@@ -125,7 +125,7 @@ export const ExperienceDetail = () => {
           <div className="grid grid-cols-2 gap-1">
             {exp.images.slice(1, 5).map((img: string, i: number) => (
               <div key={i} className="relative overflow-hidden cursor-pointer" onClick={() => { setActiveImg(i + 1); setGalleryOpen(true); }}>
-                <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" style={{ maxHeight: 238 }} />
+                <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 max-h-[238px]" />
                 {i === 3 && exp.images.length > 5 && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">Voir toutes les photos</span>
@@ -174,7 +174,7 @@ export const ExperienceDetail = () => {
 
             <div className="mt-10">
               <h2 className="font-bold text-xl text-gray-900 mb-4">Localisation</h2>
-              <div className="rounded-2xl overflow-hidden border border-gray-100" style={{ height: 220 }}>
+              <div className="rounded-2xl overflow-hidden border border-gray-100 h-[180px] sm:h-[220px]">
                 <div className="w-full h-full bg-[#e8f0ed] flex items-center justify-center">
                   <div className="text-center">
                     <MapPin size={32} className="text-[#00694c] mx-auto mb-2" />
@@ -226,7 +226,7 @@ export const ExperienceDetail = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white border border-gray-100 rounded-2xl shadow-lg p-6">
+            <div className="lg:sticky lg:top-24 bg-white border border-gray-100 rounded-2xl shadow-lg p-6">
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="font-black text-3xl text-gray-900">{exp.price}€</span>
                 <span className="text-gray-400 text-sm">/ personne</span>

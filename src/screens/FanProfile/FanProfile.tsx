@@ -17,6 +17,7 @@ export const FanProfile = () => {
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [stats, setStats] = useState({ sports: 0, hours: 0, reviews: 0 });
   const [loading, setLoading] = useState(true);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   const loadData = async () => {
     if (!user?.id) return;
@@ -90,21 +91,21 @@ export const FanProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] flex">
-      <FanSidebar />
+      <FanSidebar mobileOpen={mobileMenu} setMobileOpen={setMobileMenu} />
       <div className="flex-1 flex flex-col">
-        <FanTopbar />
+        <FanTopbar onMenuToggle={() => setMobileMenu(!mobileMenu)} />
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">
             {/* Profile Header */}
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
-              <div className="relative h-48 bg-[#2c3e50]">
+              <div className="relative h-32 sm:h-48 bg-[#2c3e50]">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <h1 className="text-6xl font-black text-white/10 tracking-widest">Profile</h1>
                 </div>
               </div>
               <div className="relative px-6 pb-6">
-                <div className="absolute -top-12 left-6">
-                  <div className="w-24 h-24 rounded-2xl bg-[#2c3e50] border-4 border-white flex items-center justify-center overflow-hidden shadow-lg">
+                <div className="absolute -top-10 sm:-top-12 left-4 sm:left-6">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#2c3e50] border-4 border-white flex items-center justify-center overflow-hidden shadow-lg">
                     {profile?.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -115,7 +116,7 @@ export const FanProfile = () => {
                     )}
                   </div>
                 </div>
-                <div className="pt-14 flex items-center justify-between">
+                <div className="pt-14 flex items-center justify-between flex-wrap">
                   <div>
                     <div className="flex items-center gap-3 mb-1">
                       <h1 className="font-black text-2xl text-gray-900">Mon profil</h1>
@@ -125,7 +126,7 @@ export const FanProfile = () => {
                       @{profile?.pseudo?.toLowerCase().replace(/\s/g, "_") || "julien_sporena"} • Membre depuis {profile?.member_since ? new Date(profile.member_since).toLocaleDateString("fr-FR", { month: "long", year: "numeric" }) : "Janvier 2023"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button onClick={() => navigate("/fan/settings")} className="px-4 py-2 rounded-xl bg-[#e8f0fe] text-[#00694c] text-sm font-semibold hover:bg-[#d4e4fc] transition-colors flex items-center gap-2">
                       <Pencil size={14} /> Modifier
                     </button>
